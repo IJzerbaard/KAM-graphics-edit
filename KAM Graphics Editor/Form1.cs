@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace KAM_Graphics_Editor
@@ -47,6 +45,8 @@ null
 Inn
 Vineyard";
             BuildingNames = t.Split('\n');
+            for (int i = 0; i < BuildingNames.Length; i++)
+                BuildingNames[i] = BuildingNames[i].Trim();
             return;
         }
 
@@ -121,6 +121,8 @@ Vineyard";
                     a.Offset.X = r.ReadInt32();
                     a.Offset.Y = r.ReadInt32();
                 }
+
+                animals = new List<Animal>(entities.Cast<Animal>());
 
                 for (int i = 0; i < 29; i++)
                 {
@@ -298,6 +300,7 @@ Vineyard";
             bool Dirty { get; set; }
             long RawOffset { get; set; }
             int RX { get; }
+            int lcmOfAnims { get; }
 
             void Draw(Form1 form, BitmapData d, int time);
         }
@@ -318,6 +321,7 @@ Vineyard";
             public long RawOffset { get; set; }
 
             public int RX => 2;
+            public int lcmOfAnims => AnimLength;
 
             public void Draw(Form1 form, BitmapData d, int time)
             {
@@ -330,6 +334,8 @@ Vineyard";
                 form.stackPanel2.SelectTab(0);
             }
         }
+
+        static List<Animal> animals;
 
         class Building : IEntity
         {
@@ -405,6 +411,8 @@ Vineyard";
 
             public int RX => 2;
 
+            public int lcmOfAnims { get; set; }
+
             public void Draw(Form1 form, BitmapData d, int time)
             {
                 bool drawFlags = (bool)form.flagCheckBox.Invoke(new Func<bool>(() => form.flagCheckBox.Checked));
@@ -422,10 +430,24 @@ Vineyard";
                         t.Add((int)item);
                     return t;
                 }));
+                List<int> enabledSwines = (List<int>)form.checkedListBox1.Invoke(new Func<List<int>>(() => {
+                    var t = new List<int>();
+                    foreach (var item in form.checkedListBox1.CheckedIndices)
+                        t.Add((int)item);
+                    return t;
+                }));
+                List<int> enabledHorses = (List<int>)form.checkedListBox2.Invoke(new Func<List<int>>(() => {
+                    var t = new List<int>();
+                    foreach (var item in form.checkedListBox2.CheckedIndices)
+                        t.Add((int)item);
+                    return t;
+                }));
 
                 int renderMode = (int)form.listBox1.Invoke(new Func<int>(() => form.listBox1.SelectedIndex));
                 int buildStepsWood = (int)form.trackBar3.Invoke(new Func<int>(() => form.trackBar3.Value));
                 int buildStepsStone = (int)form.trackBar6.Invoke(new Func<int>(() => form.trackBar6.Value));
+
+                lcmOfAnims = 1;
 
                 switch (renderMode)
                 {
@@ -439,6 +461,27 @@ Vineyard";
                                 drawSprite(d, 2, SupplyResourcesIn[index], 0, 0);
                             else
                                 drawSprite(d, 2, SupplyResourcesOut[index], 0, 0);
+                        }
+
+                        if (Name == "Swine Farm")
+                        {
+                            foreach (var item in enabledSwines)
+                            {
+                                var a = animals[item];
+                                int t = time % a.AnimLength;
+                                drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
+                                lcmOfAnims = lcm(lcmOfAnims, a.AnimLength);
+                            }
+                        }
+                        else if (Name == "Stables")
+                        {
+                            foreach (var item in enabledHorses)
+                            {
+                                var a = animals[item + 15];
+                                int t = time % a.AnimLength;
+                                drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
+                                lcmOfAnims = lcm(lcmOfAnims, a.AnimLength);
+                            }
                         }
 
                         if (drawSmoke)
@@ -482,6 +525,7 @@ Vineyard";
                 if (WorkAnimLength[index] == 0)
                     return;
                 drawSprite(d, 2, WorkAnim[index][time % WorkAnimLength[index]], WorkAnimX[index], WorkAnimY[index]);
+                lcmOfAnims = lcm(lcmOfAnims, WorkAnimLength[index]);
             }
 
             public void SwitchViewTo(Form1 form)
@@ -489,6 +533,7 @@ Vineyard";
                 form.listBox1.SelectedIndex = 0;
                 form.stackPanel1.SelectTab(1);
                 form.stackPanel2.SelectTab(1);
+                form.stackPanel3.SelectTab(Name == "Swine Farm" ? 1 : (Name == "Stables" ? 2 : 0));
                 form.propertyGrid1.SelectedObject = this;
                 form.trackBar1.Value = 0;
                 form.trackBar1.Maximum = WoodCost;
@@ -529,6 +574,7 @@ Vineyard";
             public long RawOffset { get; set; }
 
             public int RX => 3;
+            public int lcmOfAnims => AnimLength;
 
             public void Draw(Form1 form, BitmapData d, int time)
             {
@@ -643,10 +689,14 @@ Vineyard";
                 var p = (Tuple<int, IEntity>)_params;
                 int bmi = System.Threading.Interlocked.Increment(ref bmindex);
                 var bm = bms[bmi & 1];
+                if (System.Threading.Monitor.TryEnter(bm))
+                    System.Threading.Monitor.Exit(bm);
+                else
+                    return;
                 lock (bm)
                 {
                     var d = bm.LockBits(new Rectangle(0, 0, 400, 400),
-                        System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                        ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
                     for (int i = 0; i < d.Height; i++)
                     {
@@ -682,6 +732,76 @@ Vineyard";
                 default:
                     break;
             }
+        }
+
+        static int gcd(int a, int b)
+        {
+            while (b != 0)
+            {
+                int temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+
+        static int lcm(int a, int b)
+        {
+            return (a / gcd(a, b)) * b;
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            if (selected == null)
+                return;
+
+            timer1.Stop();
+
+            Bitmap bm = new Bitmap(400, 400);
+            var d = bm.LockBits(new Rectangle(0, 0, 400, 400), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            selected.Draw(this, d, 0);
+            bm.UnlockBits(d);
+
+            int len = selected.lcmOfAnims;
+            if (len > 1000)
+            {
+                if (MessageBox.Show("GIF would be too long (" + len + " frames), render it anyway?", "GIF too long", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+            }
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (var collection = new ImageMagick.MagickImageCollection())
+                    {
+                        for (int i = 0; i < len; i++)
+                        {
+                            bm = new Bitmap(400, 400);
+                            d = bm.LockBits(new Rectangle(0, 0, 400, 400), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                            selected.Draw(this, d, i);
+                            bm.UnlockBits(d);
+                            collection.Add(new ImageMagick.MagickImage(bm));
+                            collection[i].AnimationDelay = 10;
+                        }
+
+                        var qs = new ImageMagick.QuantizeSettings();
+                        qs.Colors = 256;
+                        qs.DitherMethod = ImageMagick.DitherMethod.No;
+                        collection.Quantize(qs);
+
+                        collection.Optimize();
+
+                        collection.Write(saveFileDialog1.FileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+
+            timer1.Start();
         }
     }
 
