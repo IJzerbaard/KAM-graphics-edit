@@ -110,6 +110,9 @@ namespace KAM_Graphics_Editor
                     treeView1.Nodes.Remove(houseroot);
             }
 
+            if (treeView1.Nodes.Count == 0)
+                treeView1.Nodes.Add("No changes to save");
+
             treeView1.EndUpdate();
         }
 

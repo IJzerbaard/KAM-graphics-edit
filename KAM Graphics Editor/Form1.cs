@@ -189,9 +189,11 @@ Vineyard";
                 try
                 {
                     var houseroot = treeView1.Nodes.Add("Houses");
+                    var animalsroot = houseroot.Nodes.Add("Pigs and Horses");
                     foreach (var item in entities)
                     {
-                        var t = houseroot.Nodes.Add(item.Name);
+                        var root = item is Animal ? animalsroot : houseroot;
+                        var t = root.Nodes.Add(item.Name);
                         t.Tag = item;
                     }
                 }
@@ -552,8 +554,9 @@ Vineyard";
         public string Name { get; }
         [ReadOnly(true)]
         public long RawOffset { get; set; }
-
+        [Browsable(false)]
         public int RX => 2;
+        [Browsable(false)]
         public int lcmOfAnims => AnimLength;
 
         public void Draw(Form1 form, BitmapData d, int time)
@@ -609,9 +612,9 @@ Vineyard";
         public sbyte EntranceOffsetPxY { get; set; }
         [Category("Construction")]
         public byte[] BuildArea { get; set; }
-        [Category("Construction")]
+        [Category("Construction Cost")]
         public byte WoodCost { get; set; }
-        [Category("Construction")]
+        [Category("Construction Cost")]
         public byte StoneCost { get; set; }
         [Category("Construction")]
         public Point[] BuildSupply { get; set; }
@@ -623,8 +626,11 @@ Vineyard";
         public sbyte SizeY2 { get; set; }
         public ushort WorkerWork { get; set; }
         public ushort WorkerRest { get; set; }
+        [Category("Production")]
         public byte[] ResInput { get; set; }
+        [Category("Production")]
         public byte[] ResOutput { get; set; }
+        [Category("Production")]
         public sbyte ResProductionX { get; set; }
         [Category("Construction")]
         public ushort MaxHealth { get; set; }
@@ -648,8 +654,9 @@ Vineyard";
         [ReadOnly(true)]
         public long RawOffset { get; set; }
 
+        [Browsable(false)]
         public int RX => 2;
-
+        [Browsable(false)]
         public int lcmOfAnims { get; set; }
 
         public void Draw(Form1 form, BitmapData d, int time)
@@ -913,16 +920,16 @@ Vineyard";
 
     class Mapelem : IEntity
     {
-        public ushort[] Anim;
-        public ushort AnimLength;
-        public bool Choppable;
-        public bool Walkable;
-        public bool BuildableOnEntireTile;
-        public int Unknown;
-        public bool Growable;
-        public bool KeepPlantingDistance;
-        public byte TreeTrunk;
-        public bool Buildable;
+        public ushort[] Anim { get; set; }
+        public ushort AnimLength { get; set; }
+        public bool Choppable { get; set; }
+        public bool Walkable { get; set; }
+        public bool BuildableOnEntireTile { get; set; }
+        public int Unknown { get; set; }
+        public bool Growable { get; set; }
+        public bool KeepPlantingDistance { get; set; }
+        public byte TreeTrunk { get; set; }
+        public bool Buildable { get; set; }
 
         public Mapelem(string name)
         {
@@ -930,10 +937,11 @@ Vineyard";
         }
 
         public string Name { get; }
-        public bool Dirty { get; set; }
+        [ReadOnly(true)]
         public long RawOffset { get; set; }
-
+        [Browsable(false)]
         public int RX => 3;
+        [Browsable(false)]
         public int lcmOfAnims => AnimLength;
 
         public void Draw(Form1 form, BitmapData d, int time)
@@ -945,6 +953,7 @@ Vineyard";
         {
             form.stackPanel1.SelectTab(2);
             form.stackPanel2.SelectTab(2);
+            form.propertyGridMapelem.SelectedObject = this;
         }
     }
 
