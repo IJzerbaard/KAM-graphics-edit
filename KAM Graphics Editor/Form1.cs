@@ -415,37 +415,17 @@ Vineyard";
 
             public void Draw(Form1 form, BitmapData d, int time)
             {
-                bool drawFlags = (bool)form.flagCheckBox.Invoke(new Func<bool>(() => form.flagCheckBox.Checked));
-                bool drawSmoke = (bool)form.smokeCheckBox.Invoke(new Func<bool>(() => form.smokeCheckBox.Checked));
-                int selectedWorkIndex = (int)form.comboBox1.Invoke(new Func<int>(() => form.comboBox1.SelectedIndex));
-                List<int> enabledFires = (List<int>)form.fireCheckBoxes.Invoke(new Func<List<int>>(() => {
-                    var t = new List<int>();
-                    foreach (var item in form.fireCheckBoxes.CheckedIndices)
-                        t.Add((int)item);
-                    return t;
-                }));
-                List<int> enabledRes = (List<int>)form.resourcesCheckBoxes.Invoke(new Func<List<int>>(() => {
-                    var t = new List<int>();
-                    foreach (var item in form.resourcesCheckBoxes.CheckedIndices)
-                        t.Add((int)item);
-                    return t;
-                }));
-                List<int> enabledSwines = (List<int>)form.checkedListBox1.Invoke(new Func<List<int>>(() => {
-                    var t = new List<int>();
-                    foreach (var item in form.checkedListBox1.CheckedIndices)
-                        t.Add((int)item);
-                    return t;
-                }));
-                List<int> enabledHorses = (List<int>)form.checkedListBox2.Invoke(new Func<List<int>>(() => {
-                    var t = new List<int>();
-                    foreach (var item in form.checkedListBox2.CheckedIndices)
-                        t.Add((int)item);
-                    return t;
-                }));
+                bool drawFlags = form.flagCheckBox.Checked;
+                bool drawSmoke = form.smokeCheckBox.Checked;
+                int selectedWorkIndex = form.comboBox1.SelectedIndex;
+                List<int> enabledFires = form.fireCheckBoxes.CheckedIndices.Cast<int>().ToList();
+                List<int> enabledRes = form.resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
+                List<int> enabledSwines = form.checkedListBox1.CheckedIndices.Cast<int>().ToList();
+                List<int> enabledHorses = form.checkedListBox2.CheckedIndices.Cast<int>().ToList();
 
-                int renderMode = (int)form.listBox1.Invoke(new Func<int>(() => form.listBox1.SelectedIndex));
-                int buildStepsWood = (int)form.trackBar3.Invoke(new Func<int>(() => form.trackBar3.Value));
-                int buildStepsStone = (int)form.trackBar6.Invoke(new Func<int>(() => form.trackBar6.Value));
+                int renderMode = form.listBox1.SelectedIndex;
+                int buildStepsWood = form.trackBar3.Value;
+                int buildStepsStone = form.trackBar6.Value;
 
                 lcmOfAnims = 1;
 
@@ -611,7 +591,7 @@ Vineyard";
             }
         }
 
-        static unsafe void drawSprite(System.Drawing.Imaging.BitmapData d, int rx, ushort sprIdx, int posx, int posy)
+        static unsafe void drawSprite(BitmapData d, int rx, ushort sprIdx, int posx, int posy)
         {
             if (sprIdx == 0xffff)
                 return;
@@ -643,7 +623,7 @@ Vineyard";
             }
         }
 
-        static unsafe void drawSpriteMasked(System.Drawing.Imaging.BitmapData d, int rx, ushort sprIdx, int posx, int posy, ushort maskIdx, int steps)
+        static unsafe void drawSpriteMasked(BitmapData d, int rx, ushort sprIdx, int posx, int posy, ushort maskIdx, int steps)
         {
             if (sprIdx == 0xffff)
                 return;
@@ -684,36 +664,23 @@ Vineyard";
 
         unsafe void drawFrame(int time, IEntity selected)
         {
-            System.Threading.ThreadPool.QueueUserWorkItem((object _params) =>
+            int bmi = System.Threading.Interlocked.Increment(ref bmindex);
+            var bm = bms[bmi & 1];
+            var d = bm.LockBits(new Rectangle(0, 0, 400, 400),
+                ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            for (int i = 0; i < d.Height; i++)
             {
-                var p = (Tuple<int, IEntity>)_params;
-                int bmi = System.Threading.Interlocked.Increment(ref bmindex);
-                var bm = bms[bmi & 1];
-                if (System.Threading.Monitor.TryEnter(bm))
-                    System.Threading.Monitor.Exit(bm);
-                else
-                    return;
-                lock (bm)
-                {
-                    var d = bm.LockBits(new Rectangle(0, 0, 400, 400),
-                        ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                int* ptr = (int*)(d.Scan0 + i * d.Stride);
+                for (int j = 0; j < d.Width; j++)
+                    *ptr++ = 0;
+            }
 
-                    for (int i = 0; i < d.Height; i++)
-                    {
-                        int* ptr = (int*)(d.Scan0 + i * d.Stride);
-                        for (int j = 0; j < d.Width; j++)
-                            *ptr++ = 0;
-                    }
+            selected.Draw(this, d, time);
 
-                    p.Item2.Draw(this, d, p.Item1);
+            bm.UnlockBits(d);
 
-                    bm.UnlockBits(d);
-                }
-                pictureBox1.Invoke(new Action(() =>
-                {
-                    pictureBox1.Image = bm;
-                }));
-            }, new Tuple<int, IEntity>(time, selected));
+            pictureBox1.Image = bm;
         }
 
         private void ListBox1_SelectedIndexChanged(object sender, EventArgs e)
