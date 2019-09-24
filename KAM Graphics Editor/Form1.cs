@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 
 namespace KAM_Graphics_Editor
 {
@@ -337,7 +339,7 @@ Vineyard";
 
         static List<Animal> animals;
 
-        class Building : IEntity
+        internal class Building : IEntity
         {
             [Category("Construction")]
             public ushort StoneTexture { get; set; }
@@ -347,7 +349,8 @@ Vineyard";
             public ushort  WoodenConstructionMaskTexture { get; set; }
             [Category("Construction")]
             public ushort StoneConstructionMaskTexture { get; set; }
-
+            [Category("Working")]
+            public WorkAnimationsList WorkAnimations { get; set; }
             [Category("Working")]
             public ushort[] SupplyResourcesIn { get; set; }
             [Category("Working")]
@@ -401,6 +404,7 @@ Vineyard";
                 WorkAnimLength = new ushort[19];
                 WorkAnimX = new int[19];
                 WorkAnimY = new int[19];
+                WorkAnimations = new WorkAnimationsList(this);
             }
 
             public string Name { get; }
@@ -484,7 +488,7 @@ Vineyard";
 
                         foreach (var item in enabledFires)
                         {
-                            drawWorkAnim(d, time, item + 10);
+                            drawWorkAnim(d, time, item + 11);
                         }
                         break;
 
@@ -528,6 +532,107 @@ Vineyard";
                 form.trackBar5.Maximum = StoneCost;
                 form.trackBar6.Maximum = StoneSteps;
                 form.trackBar6.Value = StoneSteps;
+            }
+        }
+
+        class WALEdit : UITypeEditor
+        {
+            public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+            {
+                return UITypeEditorEditStyle.Modal;
+            }
+
+            public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+            {
+                IWindowsFormsEditorService svc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+                WorkAnimationsList foo = value as WorkAnimationsList;
+                if (svc != null && foo != null)
+                {
+                    using (BuildingAnimEditor form = new BuildingAnimEditor())
+                    {
+                        form.SetList(foo);
+                        svc.ShowDialog(form);
+                    }
+                }
+                return value;
+            }
+        }
+
+        internal class WorkAnimation
+        {
+            public string Name { get; private set; }
+            public Point Offset
+            {
+                get
+                {
+                    return new Point(owner.WorkAnimX[index], owner.WorkAnimY[index]);
+                }
+                set
+                {
+                    owner.WorkAnimX[index] = value.X;
+                    owner.WorkAnimY[index] = value.Y;
+                }
+            }
+
+            public ushort[] SpriteList
+            {
+                get { return owner.WorkAnim[index]; }
+                set { owner.WorkAnim[index] = value; }
+            }
+
+            public ushort SpriteCount
+            {
+                get { return owner.WorkAnimLength[index]; }
+                set { owner.WorkAnimLength[index] = Math.Min(value, (ushort)30); }
+            }
+
+            Building owner;
+            int index;
+
+            public int Index { get { return index; } }
+
+            public WorkAnimation(string name, Building owner, int index)
+            {
+                Name = name;
+                this.owner = owner;
+                this.index = index;
+            }
+        }
+
+        [Editor(typeof(WALEdit), typeof(UITypeEditor))]
+        internal class WorkAnimationsList
+        {
+            internal List<WorkAnimation> list;
+            internal Building owner;
+
+            public WorkAnimationsList(Building owner)
+            {
+                this.owner = owner;
+                list = new List<WorkAnimation>();
+                list.Add(new WorkAnimation("Work 0", owner, 0));
+                list.Add(new WorkAnimation("Work 1", owner, 1));
+                list.Add(new WorkAnimation("Work 2", owner, 2));
+                list.Add(new WorkAnimation("Work 3", owner, 3));
+                list.Add(new WorkAnimation("Work 4", owner, 4));
+                list.Add(new WorkAnimation("Smoke", owner, 5));
+                list.Add(new WorkAnimation("Flagpole", owner, 6));
+                list.Add(new WorkAnimation("Inhabitant idle", owner, 7));
+                list.Add(new WorkAnimation("Flag 0", owner, 8));
+                list.Add(new WorkAnimation("Flag 1", owner, 9));
+                list.Add(new WorkAnimation("Flag 2", owner, 10));
+                list.Add(new WorkAnimation("Fire 0", owner, 11));
+                list.Add(new WorkAnimation("Fire 1", owner, 12));
+                list.Add(new WorkAnimation("Fire 2", owner, 13));
+                list.Add(new WorkAnimation("Fire 3", owner, 14));
+                list.Add(new WorkAnimation("Fire 4", owner, 15));
+                list.Add(new WorkAnimation("Fire 5", owner, 16));
+                list.Add(new WorkAnimation("Fire 6", owner, 17));
+                list.Add(new WorkAnimation("Fire 7", owner, 18));
+            }
+
+            public override string ToString()
+            {
+                return "Work animation list";
             }
         }
 

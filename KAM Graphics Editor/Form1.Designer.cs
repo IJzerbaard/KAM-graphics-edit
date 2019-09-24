@@ -31,27 +31,23 @@
             this.components = new System.ComponentModel.Container();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.stackPanel1 = new StackPanel();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.stackPanel3 = new StackPanel();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.tabPage10 = new System.Windows.Forms.TabPage();
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.tabPage11 = new System.Windows.Forms.TabPage();
+            this.checkedListBox2 = new System.Windows.Forms.CheckedListBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.stackPanel1 = new StackPanel();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panel4 = new System.Windows.Forms.Panel();
             this.resourcesCheckBoxes = new System.Windows.Forms.CheckedListBox();
             this.fireCheckBoxes = new System.Windows.Forms.CheckedListBox();
-            this.smokeCheckBox = new System.Windows.Forms.CheckBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.smokeCheckBox = new System.Windows.Forms.CheckBox();
             this.flagCheckBox = new System.Windows.Forms.CheckBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabPage7 = new System.Windows.Forms.TabPage();
@@ -68,6 +64,11 @@
             this.label7 = new System.Windows.Forms.Label();
             this.trackBar4 = new System.Windows.Forms.TrackBar();
             this.label6 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.stackPanel2 = new StackPanel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
@@ -76,20 +77,20 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.tabPage11 = new System.Windows.Forms.TabPage();
-            this.checkedListBox2 = new System.Windows.Forms.CheckedListBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.stackPanel1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
             this.stackPanel3.SuspendLayout();
             this.tabPage10.SuspendLayout();
+            this.tabPage11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.panel3.SuspendLayout();
+            this.stackPanel1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.tabPage7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
@@ -98,11 +99,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).BeginInit();
+            this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.stackPanel2.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.tabPage11.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -137,134 +139,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Preview";
             // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.treeView1);
-            this.panel1.Controls.Add(this.panel2);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(570, 521);
-            this.panel1.TabIndex = 2;
-            // 
-            // treeView1
-            // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView1.Location = new System.Drawing.Point(0, 41);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(570, 480);
-            this.treeView1.TabIndex = 4;
-            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(570, 41);
-            this.panel2.TabIndex = 4;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(61, 17);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "KAM dir:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 17);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 17);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Entity:";
-            // 
-            // folderBrowserDialog1
-            // 
-            this.folderBrowserDialog1.Description = "K&M folder";
-            this.folderBrowserDialog1.RootFolder = System.Environment.SpecialFolder.CommonProgramFilesX86;
-            // 
-            // backgroundWorker1
-            // 
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.stackPanel1);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel3.Location = new System.Drawing.Point(3, 18);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(302, 500);
-            this.panel3.TabIndex = 0;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pictureBox1.Location = new System.Drawing.Point(305, 18);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(400, 500);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
-            // 
-            // stackPanel1
-            // 
-            this.stackPanel1.Controls.Add(this.tabPage1);
-            this.stackPanel1.Controls.Add(this.tabPage2);
-            this.stackPanel1.Controls.Add(this.tabPage5);
-            this.stackPanel1.Controls.Add(this.tabPage7);
-            this.stackPanel1.Controls.Add(this.tabPage8);
-            this.stackPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.stackPanel1.Location = new System.Drawing.Point(0, 0);
-            this.stackPanel1.Name = "stackPanel1";
-            this.stackPanel1.SelectedIndex = 0;
-            this.stackPanel1.Size = new System.Drawing.Size(302, 500);
-            this.stackPanel1.TabIndex = 0;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(294, 471);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Animal";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.stackPanel3);
-            this.tabPage2.Controls.Add(this.resourcesCheckBoxes);
-            this.tabPage2.Controls.Add(this.fireCheckBoxes);
-            this.tabPage2.Controls.Add(this.smokeCheckBox);
-            this.tabPage2.Controls.Add(this.comboBox1);
-            this.tabPage2.Controls.Add(this.flagCheckBox);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(294, 471);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Building (working)";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
             // stackPanel3
             // 
             this.stackPanel3.Controls.Add(this.tabPage9);
             this.stackPanel3.Controls.Add(this.tabPage10);
             this.stackPanel3.Controls.Add(this.tabPage11);
-            this.stackPanel3.Location = new System.Drawing.Point(133, 92);
+            this.stackPanel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.stackPanel3.Location = new System.Drawing.Point(132, 69);
             this.stackPanel3.Name = "stackPanel3";
             this.stackPanel3.SelectedIndex = 0;
-            this.stackPanel3.Size = new System.Drawing.Size(155, 373);
+            this.stackPanel3.Size = new System.Drawing.Size(155, 399);
             this.stackPanel3.TabIndex = 5;
             // 
             // tabPage9
@@ -272,7 +156,7 @@
             this.tabPage9.Location = new System.Drawing.Point(4, 25);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(147, 344);
+            this.tabPage9.Size = new System.Drawing.Size(147, 370);
             this.tabPage9.TabIndex = 0;
             this.tabPage9.Text = "Normal";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -314,9 +198,125 @@
             this.checkedListBox1.Size = new System.Drawing.Size(141, 338);
             this.checkedListBox1.TabIndex = 0;
             // 
+            // tabPage11
+            // 
+            this.tabPage11.Controls.Add(this.checkedListBox2);
+            this.tabPage11.Location = new System.Drawing.Point(4, 25);
+            this.tabPage11.Name = "tabPage11";
+            this.tabPage11.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage11.Size = new System.Drawing.Size(147, 344);
+            this.tabPage11.TabIndex = 2;
+            this.tabPage11.Text = "Stable";
+            this.tabPage11.UseVisualStyleBackColor = true;
+            // 
+            // checkedListBox2
+            // 
+            this.checkedListBox2.CheckOnClick = true;
+            this.checkedListBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.checkedListBox2.FormattingEnabled = true;
+            this.checkedListBox2.Items.AddRange(new object[] {
+            "Horse 0",
+            "Horse 1",
+            "Horse 2",
+            "Horse 3",
+            "Horse 4",
+            "Horse 5",
+            "Horse 6",
+            "Horse 7",
+            "Horse 8",
+            "Horse 9",
+            "Horse 10",
+            "Horse 11",
+            "Horse 12",
+            "Horse 13",
+            "Horse 14"});
+            this.checkedListBox2.Location = new System.Drawing.Point(3, 3);
+            this.checkedListBox2.Name = "checkedListBox2";
+            this.checkedListBox2.Size = new System.Drawing.Size(141, 338);
+            this.checkedListBox2.TabIndex = 0;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(712, 22);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(135, 31);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Export animation";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pictureBox1.Location = new System.Drawing.Point(305, 18);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(400, 500);
+            this.pictureBox1.TabIndex = 1;
+            this.pictureBox1.TabStop = false;
+            // 
+            // panel3
+            // 
+            this.panel3.Controls.Add(this.stackPanel1);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel3.Location = new System.Drawing.Point(3, 18);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(302, 500);
+            this.panel3.TabIndex = 0;
+            // 
+            // stackPanel1
+            // 
+            this.stackPanel1.Controls.Add(this.tabPage1);
+            this.stackPanel1.Controls.Add(this.tabPage2);
+            this.stackPanel1.Controls.Add(this.tabPage5);
+            this.stackPanel1.Controls.Add(this.tabPage7);
+            this.stackPanel1.Controls.Add(this.tabPage8);
+            this.stackPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stackPanel1.Location = new System.Drawing.Point(0, 0);
+            this.stackPanel1.Name = "stackPanel1";
+            this.stackPanel1.SelectedIndex = 0;
+            this.stackPanel1.Size = new System.Drawing.Size(302, 500);
+            this.stackPanel1.TabIndex = 0;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(294, 471);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Animal";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.stackPanel3);
+            this.tabPage2.Controls.Add(this.panel4);
+            this.tabPage2.Controls.Add(this.comboBox1);
+            this.tabPage2.Controls.Add(this.smokeCheckBox);
+            this.tabPage2.Controls.Add(this.flagCheckBox);
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(294, 471);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Building (working)";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.resourcesCheckBoxes);
+            this.panel4.Controls.Add(this.fireCheckBoxes);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel4.Location = new System.Drawing.Point(3, 69);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(129, 399);
+            this.panel4.TabIndex = 5;
+            // 
             // resourcesCheckBoxes
             // 
             this.resourcesCheckBoxes.CheckOnClick = true;
+            this.resourcesCheckBoxes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.resourcesCheckBoxes.FormattingEnabled = true;
             this.resourcesCheckBoxes.Items.AddRange(new object[] {
             "In1: 1",
@@ -349,14 +349,15 @@
             "Out3: 3",
             "Out3: 4",
             "Out3: 5"});
-            this.resourcesCheckBoxes.Location = new System.Drawing.Point(6, 221);
+            this.resourcesCheckBoxes.Location = new System.Drawing.Point(0, 140);
             this.resourcesCheckBoxes.Name = "resourcesCheckBoxes";
-            this.resourcesCheckBoxes.Size = new System.Drawing.Size(120, 242);
+            this.resourcesCheckBoxes.Size = new System.Drawing.Size(129, 259);
             this.resourcesCheckBoxes.TabIndex = 4;
             // 
             // fireCheckBoxes
             // 
             this.fireCheckBoxes.CheckOnClick = true;
+            this.fireCheckBoxes.Dock = System.Windows.Forms.DockStyle.Top;
             this.fireCheckBoxes.FormattingEnabled = true;
             this.fireCheckBoxes.Items.AddRange(new object[] {
             "Fire 0",
@@ -365,24 +366,16 @@
             "Fire 3",
             "Fire 4",
             "Fire 5",
-            "Fire 6"});
-            this.fireCheckBoxes.Location = new System.Drawing.Point(6, 92);
+            "Fire 6",
+            "Fire 7"});
+            this.fireCheckBoxes.Location = new System.Drawing.Point(0, 0);
             this.fireCheckBoxes.Name = "fireCheckBoxes";
-            this.fireCheckBoxes.Size = new System.Drawing.Size(120, 123);
+            this.fireCheckBoxes.Size = new System.Drawing.Size(129, 140);
             this.fireCheckBoxes.TabIndex = 3;
-            // 
-            // smokeCheckBox
-            // 
-            this.smokeCheckBox.AutoSize = true;
-            this.smokeCheckBox.Location = new System.Drawing.Point(6, 34);
-            this.smokeCheckBox.Name = "smokeCheckBox";
-            this.smokeCheckBox.Size = new System.Drawing.Size(73, 21);
-            this.smokeCheckBox.TabIndex = 2;
-            this.smokeCheckBox.Text = "Smoke";
-            this.smokeCheckBox.UseVisualStyleBackColor = true;
             // 
             // comboBox1
             // 
+            this.comboBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "No worker",
@@ -392,19 +385,31 @@
             "Work 2",
             "Work 3",
             "Work 4"});
-            this.comboBox1.Location = new System.Drawing.Point(6, 61);
+            this.comboBox1.Location = new System.Drawing.Point(3, 45);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(282, 24);
+            this.comboBox1.Size = new System.Drawing.Size(288, 24);
             this.comboBox1.TabIndex = 1;
+            // 
+            // smokeCheckBox
+            // 
+            this.smokeCheckBox.AutoSize = true;
+            this.smokeCheckBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.smokeCheckBox.Location = new System.Drawing.Point(3, 24);
+            this.smokeCheckBox.Name = "smokeCheckBox";
+            this.smokeCheckBox.Size = new System.Drawing.Size(288, 21);
+            this.smokeCheckBox.TabIndex = 2;
+            this.smokeCheckBox.Text = "Smoke";
+            this.smokeCheckBox.UseVisualStyleBackColor = true;
             // 
             // flagCheckBox
             // 
             this.flagCheckBox.AutoSize = true;
             this.flagCheckBox.Checked = true;
             this.flagCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.flagCheckBox.Location = new System.Drawing.Point(6, 6);
+            this.flagCheckBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.flagCheckBox.Location = new System.Drawing.Point(3, 3);
             this.flagCheckBox.Name = "flagCheckBox";
-            this.flagCheckBox.Size = new System.Drawing.Size(57, 21);
+            this.flagCheckBox.Size = new System.Drawing.Size(288, 21);
             this.flagCheckBox.TabIndex = 0;
             this.flagCheckBox.Text = "Flag";
             this.flagCheckBox.UseVisualStyleBackColor = true;
@@ -547,6 +552,53 @@
             this.label6.TabIndex = 1;
             this.label6.Text = "Planks";
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.treeView1);
+            this.panel1.Controls.Add(this.panel2);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(570, 521);
+            this.panel1.TabIndex = 2;
+            // 
+            // treeView1
+            // 
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.Location = new System.Drawing.Point(0, 41);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.Size = new System.Drawing.Size(570, 480);
+            this.treeView1.TabIndex = 4;
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(570, 41);
+            this.panel2.TabIndex = 4;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(61, 17);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "KAM dir:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 17);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(47, 17);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Entity:";
+            // 
             // stackPanel2
             // 
             this.stackPanel2.Controls.Add(this.tabPage3);
@@ -635,52 +687,18 @@
             this.tabPage6.Text = "Mapelem";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
-            // tabPage11
+            // folderBrowserDialog1
             // 
-            this.tabPage11.Controls.Add(this.checkedListBox2);
-            this.tabPage11.Location = new System.Drawing.Point(4, 25);
-            this.tabPage11.Name = "tabPage11";
-            this.tabPage11.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage11.Size = new System.Drawing.Size(147, 344);
-            this.tabPage11.TabIndex = 2;
-            this.tabPage11.Text = "Stable";
-            this.tabPage11.UseVisualStyleBackColor = true;
+            this.folderBrowserDialog1.Description = "K&M folder";
+            this.folderBrowserDialog1.RootFolder = System.Environment.SpecialFolder.CommonProgramFilesX86;
             // 
-            // checkedListBox2
+            // backgroundWorker1
             // 
-            this.checkedListBox2.CheckOnClick = true;
-            this.checkedListBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.checkedListBox2.FormattingEnabled = true;
-            this.checkedListBox2.Items.AddRange(new object[] {
-            "Horse 0",
-            "Horse 1",
-            "Horse 2",
-            "Horse 3",
-            "Horse 4",
-            "Horse 5",
-            "Horse 6",
-            "Horse 7",
-            "Horse 8",
-            "Horse 9",
-            "Horse 10",
-            "Horse 11",
-            "Horse 12",
-            "Horse 13",
-            "Horse 14"});
-            this.checkedListBox2.Location = new System.Drawing.Point(3, 3);
-            this.checkedListBox2.Name = "checkedListBox2";
-            this.checkedListBox2.Size = new System.Drawing.Size(141, 338);
-            this.checkedListBox2.TabIndex = 0;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
             // 
-            // button1
+            // timer1
             // 
-            this.button1.Location = new System.Drawing.Point(712, 22);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(135, 31);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Export animation";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // saveFileDialog1
             // 
@@ -697,16 +715,15 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.panel3.ResumeLayout(false);
+            this.stackPanel3.ResumeLayout(false);
+            this.tabPage10.ResumeLayout(false);
+            this.tabPage11.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.panel3.ResumeLayout(false);
             this.stackPanel1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
-            this.stackPanel3.ResumeLayout(false);
-            this.tabPage10.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
             this.tabPage7.ResumeLayout(false);
             this.tabPage7.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).EndInit();
@@ -717,11 +734,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.stackPanel2.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
-            this.tabPage11.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -779,6 +798,7 @@
         private System.Windows.Forms.TabPage tabPage11;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.Panel panel4;
     }
 }
 
