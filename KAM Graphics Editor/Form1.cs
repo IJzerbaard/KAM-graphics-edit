@@ -16,7 +16,10 @@ namespace KAM_Graphics_Editor
         public Form1()
         {
             InitializeComponent();
+        }
 
+        static Form1()
+        {
             var t = @"Sawmill
 Iron Smithy
 Weapon Smithy
@@ -49,10 +52,9 @@ Vineyard";
             BuildingNames = t.Split('\n');
             for (int i = 0; i < BuildingNames.Length; i++)
                 BuildingNames[i] = BuildingNames[i].Trim();
-            return;
         }
 
-        string[] BuildingNames;
+        public static string[] BuildingNames;
         string KAMDataFolder;
 
         void findKAMfolder()
@@ -97,13 +99,13 @@ Vineyard";
         void loadpalette()
         {
             var bm = Properties.Resources.pal;
-            var d = bm.LockBits(new Rectangle(0, 0, bm.Width, bm.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var d = bm.LockBits(new Rectangle(0, 0, bm.Width, bm.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             palette = new int[256];
             System.Runtime.InteropServices.Marshal.Copy(d.Scan0 + 64 * d.Stride, palette, 0, 256);
             bm.UnlockBits(d);
         }
 
+        List<IEntity> entities = new List<IEntity>();
 
         void loadHouses()
         {
@@ -120,8 +122,7 @@ Vineyard";
                     a.RawOffset = r.BaseStream.Position;
                     a.Anim = r.ReadUInt16s(30);
                     a.AnimLength = r.ReadUInt16();
-                    a.Offset.X = r.ReadInt32();
-                    a.Offset.Y = r.ReadInt32();
+                    a.Offset = new Point(r.ReadInt32(), r.ReadInt32());
                 }
 
                 animals = new List<Animal>(entities.Cast<Animal>());
@@ -180,6 +181,8 @@ Vineyard";
                 }
             }
 
+            this.entities.AddRange(entities);
+
             treeView1.Invoke(new Action(() =>
             {
                 treeView1.BeginUpdate();
@@ -225,6 +228,8 @@ Vineyard";
                 }
             }
 
+            this.entities.AddRange(entities);
+
             treeView1.Invoke(new Action(() =>
             {
                 treeView1.BeginUpdate();
@@ -248,7 +253,6 @@ Vineyard";
         {
             public ushort W, H;
             public int X, Y;
-            public bool Dirty;
             public byte[] Raw;
         }
 
@@ -295,383 +299,7 @@ Vineyard";
             { }
         }
 
-        interface IEntity
-        {
-            void SwitchViewTo(Form1 form);
-            string Name { get; }
-            bool Dirty { get; set; }
-            long RawOffset { get; set; }
-            int RX { get; }
-            int lcmOfAnims { get; }
-
-            void Draw(Form1 form, BitmapData d, int time);
-        }
-
-        class Animal : IEntity
-        {
-            public Point Offset;
-            public ushort[] Anim;
-            public ushort AnimLength;
-
-            public Animal(string name)
-            {
-                Name = name;
-            }
-
-            public string Name { get; }
-            public bool Dirty { get; set; }
-            public long RawOffset { get; set; }
-
-            public int RX => 2;
-            public int lcmOfAnims => AnimLength;
-
-            public void Draw(Form1 form, BitmapData d, int time)
-            {
-                drawSprite(d, 2, Anim[time % AnimLength], 0, 0);
-            }
-
-            public void SwitchViewTo(Form1 form)
-            {
-                form.stackPanel1.SelectTab(0);
-                form.stackPanel2.SelectTab(0);
-            }
-        }
-
-        static List<Animal> animals;
-
-        internal class Building : IEntity
-        {
-            [Category("Construction")]
-            public ushort StoneTexture { get; set; }
-            [Category("Construction")]
-            public ushort WoodTexture { get; set; }
-            [Category("Construction")]
-            public ushort  WoodenConstructionMaskTexture { get; set; }
-            [Category("Construction")]
-            public ushort StoneConstructionMaskTexture { get; set; }
-            [Category("Working")]
-            public WorkAnimationsList WorkAnimations { get; set; }
-            [Category("Working")]
-            public ushort[] SupplyResourcesIn { get; set; }
-            [Category("Working")]
-            public ushort[] SupplyResourcesOut { get; set; }
-            [Category("Working")]
-            public ushort[][] WorkAnim { get; set; }
-            [Category("Working")]
-            public ushort[] WorkAnimLength { get; set; }
-            [Category("Working")]
-            public int[] WorkAnimX { get; set; }
-            [Category("Working")]
-            public int[] WorkAnimY { get; set; }
-            [Category("Construction")]
-            public ushort WoodSteps { get; set; }
-            [Category("Construction")]
-            public ushort StoneSteps { get; set; }
-            public ushort a1 { get; set; }
-            public sbyte EntranceOffsetX { get; set; }
-            public sbyte EntranceOffsetY { get; set; }
-            public sbyte EntranceOffsetPxX { get; set; }
-            public sbyte EntranceOffsetPxY { get; set; }
-            [Category("Construction")]
-            public byte[] BuildArea { get; set; }
-            [Category("Construction")]
-            public byte WoodCost { get; set; }
-            [Category("Construction")]
-            public byte StoneCost { get; set; }
-            [Category("Construction")]
-            public Point[] BuildSupply { get; set; }
-            public ushort a5 { get; set; }
-            public ushort SizeArea { get; set; }
-            public sbyte SizeX { get; set; }
-            public sbyte SizeY { get; set; }
-            public sbyte SizeX2 { get; set; }
-            public sbyte SizeY2 { get; set; }
-            public ushort WorkerWork { get; set; }
-            public ushort WorkerRest { get; set; }
-            public byte[] ResInput { get; set; }
-            public byte[] ResOutput { get; set; }
-            public sbyte ResProductionX { get; set; }
-            [Category("Construction")]
-            public ushort MaxHealth { get; set; }
-            public ushort Sight { get; set; }
-            public byte OwnerType { get; set; }
-            public byte[] Unknown { get; set; }
-
-            public Building(string name)
-            {
-                Name = name;
-                WorkAnim = new ushort[19][];
-                WorkAnimLength = new ushort[19];
-                WorkAnimX = new int[19];
-                WorkAnimY = new int[19];
-                WorkAnimations = new WorkAnimationsList(this);
-            }
-
-            public string Name { get; }
-            [Browsable(false)]
-            public bool Dirty { get; set; }
-            [ReadOnly(true)]
-            public long RawOffset { get; set; }
-
-            public int RX => 2;
-
-            public int lcmOfAnims { get; set; }
-
-            public void Draw(Form1 form, BitmapData d, int time)
-            {
-                bool drawFlags = form.flagCheckBox.Checked;
-                bool drawSmoke = form.smokeCheckBox.Checked;
-                int selectedWorkIndex = form.comboBox1.SelectedIndex;
-                List<int> enabledFires = form.fireCheckBoxes.CheckedIndices.Cast<int>().ToList();
-                List<int> enabledRes = form.resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
-                List<int> enabledSwines = form.checkedListBox1.CheckedIndices.Cast<int>().ToList();
-                List<int> enabledHorses = form.checkedListBox2.CheckedIndices.Cast<int>().ToList();
-
-                int renderMode = form.listBox1.SelectedIndex;
-                int buildStepsWood = form.trackBar3.Value;
-                int buildStepsStone = form.trackBar6.Value;
-
-                lcmOfAnims = 1;
-
-                switch (renderMode)
-                {
-                    case 0:
-                        drawSprite(d, 2, StoneTexture, 0, 0);
-
-                        foreach (var item in enabledRes)
-                        {
-                            int index = item % 5 + 5 * (item / 10);
-                            if (((item / 5) & 1) == 0)
-                                drawSprite(d, 2, SupplyResourcesIn[index], 0, 0);
-                            else
-                                drawSprite(d, 2, SupplyResourcesOut[index], 0, 0);
-                        }
-
-                        if (Name == "Swine Farm")
-                        {
-                            foreach (var item in enabledSwines)
-                            {
-                                var a = animals[item];
-                                int t = time % a.AnimLength;
-                                drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
-                                lcmOfAnims = lcm(lcmOfAnims, a.AnimLength);
-                            }
-                        }
-                        else if (Name == "Stables")
-                        {
-                            foreach (var item in enabledHorses)
-                            {
-                                var a = animals[item + 15];
-                                int t = time % a.AnimLength;
-                                drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
-                                lcmOfAnims = lcm(lcmOfAnims, a.AnimLength);
-                            }
-                        }
-
-                        if (drawSmoke)
-                            drawWorkAnim(d, time, 5);
-
-                        if (drawFlags)
-                        {
-                            drawWorkAnim(d, time, 6);
-                            drawWorkAnim(d, time, 8);
-                            drawWorkAnim(d, time, 9);
-                            drawWorkAnim(d, time, 10);
-                        }
-
-                        if (selectedWorkIndex == 0)
-                            ; // nothing
-                        else if (selectedWorkIndex == 1)
-                            drawWorkAnim(d, time, 7);
-                        else
-                            drawWorkAnim(d, time, selectedWorkIndex - 2);
-
-                        foreach (var item in enabledFires)
-                        {
-                            drawWorkAnim(d, time, item + 11);
-                        }
-                        break;
-
-                    case 1:
-                        // building frame
-                        drawSpriteMasked(d, 2, WoodTexture, 0, 0, WoodenConstructionMaskTexture, buildStepsWood);
-                        break;
-                    case 2:
-                        // building stone
-                        drawSprite(d, 2, WoodTexture, 0, 0);
-                        drawSpriteMasked(d, 2, StoneTexture, 0, 0, StoneConstructionMaskTexture, buildStepsStone);
-                        break;
-                }
-            }
-
-            void drawWorkAnim(BitmapData d, int time, int index)
-            {
-                if (WorkAnimLength[index] == 0)
-                    return;
-                drawSprite(d, 2, WorkAnim[index][time % WorkAnimLength[index]], WorkAnimX[index], WorkAnimY[index]);
-                lcmOfAnims = lcm(lcmOfAnims, WorkAnimLength[index]);
-            }
-
-            public void SwitchViewTo(Form1 form)
-            {
-                form.listBox1.SelectedIndex = 0;
-                form.stackPanel1.SelectTab(1);
-                form.stackPanel2.SelectTab(1);
-                form.stackPanel3.SelectTab(Name == "Swine Farm" ? 1 : (Name == "Stables" ? 2 : 0));
-                form.propertyGrid1.SelectedObject = this;
-                form.trackBar1.Value = 0;
-                form.trackBar1.Maximum = WoodCost;
-                form.trackBar2.Value = 0;
-                form.trackBar2.Maximum = StoneCost;
-                form.trackBar3.Maximum = WoodSteps;
-                form.trackBar3.Value = WoodSteps;
-
-                form.trackBar4.Value = 0;
-                form.trackBar4.Maximum = WoodCost;
-                form.trackBar5.Value = 0;
-                form.trackBar5.Maximum = StoneCost;
-                form.trackBar6.Maximum = StoneSteps;
-                form.trackBar6.Value = StoneSteps;
-            }
-        }
-
-        class WALEdit : UITypeEditor
-        {
-            public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
-            {
-                return UITypeEditorEditStyle.Modal;
-            }
-
-            public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
-            {
-                IWindowsFormsEditorService svc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
-                WorkAnimationsList foo = value as WorkAnimationsList;
-                if (svc != null && foo != null)
-                {
-                    using (BuildingAnimEditor form = new BuildingAnimEditor())
-                    {
-                        form.SetList(foo);
-                        svc.ShowDialog(form);
-                    }
-                }
-                return value;
-            }
-        }
-
-        internal class WorkAnimation
-        {
-            public string Name { get; private set; }
-            public Point Offset
-            {
-                get
-                {
-                    return new Point(owner.WorkAnimX[index], owner.WorkAnimY[index]);
-                }
-                set
-                {
-                    owner.WorkAnimX[index] = value.X;
-                    owner.WorkAnimY[index] = value.Y;
-                }
-            }
-
-            public ushort[] SpriteList
-            {
-                get { return owner.WorkAnim[index]; }
-                set { owner.WorkAnim[index] = value; }
-            }
-
-            public ushort SpriteCount
-            {
-                get { return owner.WorkAnimLength[index]; }
-                set { owner.WorkAnimLength[index] = Math.Min(value, (ushort)30); }
-            }
-
-            Building owner;
-            int index;
-
-            public int Index { get { return index; } }
-
-            public WorkAnimation(string name, Building owner, int index)
-            {
-                Name = name;
-                this.owner = owner;
-                this.index = index;
-            }
-        }
-
-        [Editor(typeof(WALEdit), typeof(UITypeEditor))]
-        internal class WorkAnimationsList
-        {
-            internal List<WorkAnimation> list;
-            internal Building owner;
-
-            public WorkAnimationsList(Building owner)
-            {
-                this.owner = owner;
-                list = new List<WorkAnimation>();
-                list.Add(new WorkAnimation("Work 0", owner, 0));
-                list.Add(new WorkAnimation("Work 1", owner, 1));
-                list.Add(new WorkAnimation("Work 2", owner, 2));
-                list.Add(new WorkAnimation("Work 3", owner, 3));
-                list.Add(new WorkAnimation("Work 4", owner, 4));
-                list.Add(new WorkAnimation("Smoke", owner, 5));
-                list.Add(new WorkAnimation("Flagpole", owner, 6));
-                list.Add(new WorkAnimation("Inhabitant idle", owner, 7));
-                list.Add(new WorkAnimation("Flag 0", owner, 8));
-                list.Add(new WorkAnimation("Flag 1", owner, 9));
-                list.Add(new WorkAnimation("Flag 2", owner, 10));
-                list.Add(new WorkAnimation("Fire 0", owner, 11));
-                list.Add(new WorkAnimation("Fire 1", owner, 12));
-                list.Add(new WorkAnimation("Fire 2", owner, 13));
-                list.Add(new WorkAnimation("Fire 3", owner, 14));
-                list.Add(new WorkAnimation("Fire 4", owner, 15));
-                list.Add(new WorkAnimation("Fire 5", owner, 16));
-                list.Add(new WorkAnimation("Fire 6", owner, 17));
-                list.Add(new WorkAnimation("Fire 7", owner, 18));
-            }
-
-            public override string ToString()
-            {
-                return "Work animation list";
-            }
-        }
-
-        class Mapelem : IEntity
-        {
-            public ushort[] Anim;
-            public ushort AnimLength;
-            public bool Choppable;
-            public bool Walkable;
-            public bool BuildableOnEntireTile;
-            public int Unknown;
-            public bool Growable;
-            public bool KeepPlantingDistance;
-            public byte TreeTrunk;
-            public bool Buildable;
-
-            public Mapelem(string name)
-            {
-                Name = name;
-            }
-
-            public string Name { get; }
-            public bool Dirty { get; set; }
-            public long RawOffset { get; set; }
-
-            public int RX => 3;
-            public int lcmOfAnims => AnimLength;
-
-            public void Draw(Form1 form, BitmapData d, int time)
-            {
-                drawSprite(d, 3, Anim[time % AnimLength], 0, 0);
-            }
-
-            public void SwitchViewTo(Form1 form)
-            {
-                form.stackPanel1.SelectTab(2);
-                form.stackPanel2.SelectTab(2);
-            }
-        }
+        internal static List<Animal> animals;
 
         private void TreeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -696,7 +324,7 @@ Vineyard";
             }
         }
 
-        static unsafe void drawSprite(BitmapData d, int rx, ushort sprIdx, int posx, int posy)
+        public static unsafe void drawSprite(BitmapData d, int rx, ushort sprIdx, int posx, int posy)
         {
             if (sprIdx == 0xffff)
                 return;
@@ -728,7 +356,7 @@ Vineyard";
             }
         }
 
-        static unsafe void drawSpriteMasked(BitmapData d, int rx, ushort sprIdx, int posx, int posy, ushort maskIdx, int steps)
+        public static unsafe void drawSpriteMasked(BitmapData d, int rx, ushort sprIdx, int posx, int posy, ushort maskIdx, int steps)
         {
             if (sprIdx == 0xffff)
                 return;
@@ -817,7 +445,7 @@ Vineyard";
             return a;
         }
 
-        static int lcm(int a, int b)
+        public static int lcm(int a, int b)
         {
             return (a / gcd(a, b)) * b;
         }
@@ -875,6 +503,449 @@ Vineyard";
 
             timer1.Start();
         }
+
+        private void ToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (KAMDataFolder == null)
+            {
+                MessageBox.Show("No data loaded");
+                return;
+            }
+
+            var s = new SaveChanges(entities, KAMDataFolder);
+            s.ShowDialog();
+        }
+
+        private void ReplaceSpriteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+
+    interface IEntity
+    {
+        void SwitchViewTo(Form1 form);
+        string Name { get; }
+        long RawOffset { get; set; }
+        int RX { get; }
+        int lcmOfAnims { get; }
+
+        void Draw(Form1 form, BitmapData d, int time);
+    }
+
+    class Animal : IEntity, IEquatable<Animal>
+    {
+        public Point Offset { get; set; }
+        public ushort[] Anim { get; set; }
+        public ushort AnimLength { get; set; }
+
+        public Animal(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+        [ReadOnly(true)]
+        public long RawOffset { get; set; }
+
+        public int RX => 2;
+        public int lcmOfAnims => AnimLength;
+
+        public void Draw(Form1 form, BitmapData d, int time)
+        {
+            Form1.drawSprite(d, 2, Anim[time % AnimLength], 0, 0);
+        }
+
+        public bool Equals(Animal other)
+        {
+            return Offset == other.Offset && AnimLength == other.AnimLength &&
+                Anim.SequenceEqual(other.Anim);
+        }
+
+        public void SwitchViewTo(Form1 form)
+        {
+            form.stackPanel1.SelectTab(0);
+            form.stackPanel2.SelectTab(0);
+        }
+    }
+
+    internal class Building : IEntity, IEquatable<Building>
+    {
+        [Category("Construction")]
+        public ushort StoneTexture { get; set; }
+        [Category("Construction")]
+        public ushort WoodTexture { get; set; }
+        [Category("Construction")]
+        public ushort WoodenConstructionMaskTexture { get; set; }
+        [Category("Construction")]
+        public ushort StoneConstructionMaskTexture { get; set; }
+        [Category("Working")]
+        public WorkAnimationsList WorkAnimations { get; set; }
+        [Category("Working")]
+        public ushort[] SupplyResourcesIn { get; set; }
+        [Category("Working")]
+        public ushort[] SupplyResourcesOut { get; set; }
+        [Category("Working")]
+        public ushort[][] WorkAnim { get; set; }
+        [Category("Working")]
+        public ushort[] WorkAnimLength { get; set; }
+        [Category("Working")]
+        public int[] WorkAnimX { get; set; }
+        [Category("Working")]
+        public int[] WorkAnimY { get; set; }
+        [Category("Construction")]
+        public ushort WoodSteps { get; set; }
+        [Category("Construction")]
+        public ushort StoneSteps { get; set; }
+        public ushort a1 { get; set; }
+        public sbyte EntranceOffsetX { get; set; }
+        public sbyte EntranceOffsetY { get; set; }
+        public sbyte EntranceOffsetPxX { get; set; }
+        public sbyte EntranceOffsetPxY { get; set; }
+        [Category("Construction")]
+        public byte[] BuildArea { get; set; }
+        [Category("Construction")]
+        public byte WoodCost { get; set; }
+        [Category("Construction")]
+        public byte StoneCost { get; set; }
+        [Category("Construction")]
+        public Point[] BuildSupply { get; set; }
+        public ushort a5 { get; set; }
+        public ushort SizeArea { get; set; }
+        public sbyte SizeX { get; set; }
+        public sbyte SizeY { get; set; }
+        public sbyte SizeX2 { get; set; }
+        public sbyte SizeY2 { get; set; }
+        public ushort WorkerWork { get; set; }
+        public ushort WorkerRest { get; set; }
+        public byte[] ResInput { get; set; }
+        public byte[] ResOutput { get; set; }
+        public sbyte ResProductionX { get; set; }
+        [Category("Construction")]
+        public ushort MaxHealth { get; set; }
+        public ushort Sight { get; set; }
+        public byte OwnerType { get; set; }
+        public byte[] Unknown { get; set; }
+
+        public Building(string name)
+        {
+            Name = name;
+            WorkAnim = new ushort[19][];
+            WorkAnimLength = new ushort[19];
+            WorkAnimX = new int[19];
+            WorkAnimY = new int[19];
+            WorkAnimations = new WorkAnimationsList(this);
+        }
+
+        public string Name { get; }
+        [Browsable(false)]
+        public bool Dirty { get; set; }
+        [ReadOnly(true)]
+        public long RawOffset { get; set; }
+
+        public int RX => 2;
+
+        public int lcmOfAnims { get; set; }
+
+        public void Draw(Form1 form, BitmapData d, int time)
+        {
+            bool drawFlags = form.flagCheckBox.Checked;
+            bool drawSmoke = form.smokeCheckBox.Checked;
+            int selectedWorkIndex = form.comboBox1.SelectedIndex;
+            List<int> enabledFires = form.fireCheckBoxes.CheckedIndices.Cast<int>().ToList();
+            List<int> enabledRes = form.resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
+            List<int> enabledSwines = form.checkedListBox1.CheckedIndices.Cast<int>().ToList();
+            List<int> enabledHorses = form.checkedListBox2.CheckedIndices.Cast<int>().ToList();
+
+            int renderMode = form.listBox1.SelectedIndex;
+            int buildStepsWood = form.trackBar3.Value;
+            int buildStepsStone = form.trackBar6.Value;
+
+            lcmOfAnims = 1;
+
+            switch (renderMode)
+            {
+                case 0:
+                    Form1.drawSprite(d, 2, StoneTexture, 0, 0);
+
+                    foreach (var item in enabledRes)
+                    {
+                        int index = item % 5 + 5 * (item / 10);
+                        if (((item / 5) & 1) == 0)
+                            Form1.drawSprite(d, 2, SupplyResourcesIn[index], 0, 0);
+                        else
+                            Form1.drawSprite(d, 2, SupplyResourcesOut[index], 0, 0);
+                    }
+
+                    if (Name == "Swine Farm")
+                    {
+                        foreach (var item in enabledSwines)
+                        {
+                            var a = Form1.animals[item];
+                            int t = time % a.AnimLength;
+                            Form1.drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
+                            lcmOfAnims = Form1.lcm(lcmOfAnims, a.AnimLength);
+                        }
+                    }
+                    else if (Name == "Stables")
+                    {
+                        foreach (var item in enabledHorses)
+                        {
+                            var a = Form1.animals[item + 15];
+                            int t = time % a.AnimLength;
+                            Form1.drawSprite(d, 2, a.Anim[t], a.Offset.X, a.Offset.Y);
+                            lcmOfAnims = Form1.lcm(lcmOfAnims, a.AnimLength);
+                        }
+                    }
+
+                    if (drawSmoke)
+                        drawWorkAnim(d, time, 5);
+
+                    if (drawFlags)
+                    {
+                        drawWorkAnim(d, time, 6);
+                        drawWorkAnim(d, time, 8);
+                        drawWorkAnim(d, time, 9);
+                        drawWorkAnim(d, time, 10);
+                    }
+
+                    if (selectedWorkIndex == 0)
+                        ; // nothing
+                    else if (selectedWorkIndex == 1)
+                        drawWorkAnim(d, time, 7);
+                    else
+                        drawWorkAnim(d, time, selectedWorkIndex - 2);
+
+                    foreach (var item in enabledFires)
+                    {
+                        drawWorkAnim(d, time, item + 11);
+                    }
+                    break;
+
+                case 1:
+                    // building frame
+                    Form1.drawSpriteMasked(d, 2, WoodTexture, 0, 0, WoodenConstructionMaskTexture, buildStepsWood);
+                    break;
+                case 2:
+                    // building stone
+                    Form1.drawSprite(d, 2, WoodTexture, 0, 0);
+                    Form1.drawSpriteMasked(d, 2, StoneTexture, 0, 0, StoneConstructionMaskTexture, buildStepsStone);
+                    break;
+            }
+        }
+
+        void drawWorkAnim(BitmapData d, int time, int index)
+        {
+            if (WorkAnimLength[index] == 0)
+                return;
+            Form1.drawSprite(d, 2, WorkAnim[index][time % WorkAnimLength[index]], WorkAnimX[index], WorkAnimY[index]);
+            lcmOfAnims = Form1.lcm(lcmOfAnims, WorkAnimLength[index]);
+        }
+
+        public void SwitchViewTo(Form1 form)
+        {
+            form.listBox1.SelectedIndex = 0;
+            form.stackPanel1.SelectTab(1);
+            form.stackPanel2.SelectTab(1);
+            form.stackPanel3.SelectTab(Name == "Swine Farm" ? 1 : (Name == "Stables" ? 2 : 0));
+            form.propertyGrid1.SelectedObject = this;
+            form.trackBar1.Value = 0;
+            form.trackBar1.Maximum = WoodCost;
+            form.trackBar2.Value = 0;
+            form.trackBar2.Maximum = StoneCost;
+            form.trackBar3.Maximum = WoodSteps;
+            form.trackBar3.Value = WoodSteps;
+
+            form.trackBar4.Value = 0;
+            form.trackBar4.Maximum = WoodCost;
+            form.trackBar5.Value = 0;
+            form.trackBar5.Maximum = StoneCost;
+            form.trackBar6.Maximum = StoneSteps;
+            form.trackBar6.Value = StoneSteps;
+        }
+
+        public bool Equals(Building other)
+        {
+            return StoneTexture == other.StoneTexture &&
+                WoodTexture == other.WoodTexture &&
+                WoodenConstructionMaskTexture == other.WoodenConstructionMaskTexture &&
+                StoneConstructionMaskTexture == other.StoneConstructionMaskTexture &&
+                SupplyResourcesIn.SequenceEqual(other.SupplyResourcesIn) &&
+                SupplyResourcesOut.SequenceEqual(other.SupplyResourcesOut) &&
+                WorkAnim.Zip(other.WorkAnim, (a, b) => a.SequenceEqual(b)).All(a => a) &&
+                WorkAnimLength.SequenceEqual(other.WorkAnimLength) &&
+                WorkAnimX.SequenceEqual(other.WorkAnimX) &&
+                WorkAnimY.SequenceEqual(other.WorkAnimY) &&
+                WoodSteps == other.WoodSteps &&
+                StoneSteps == other.StoneSteps &&
+                a1 == other.a1 &&
+                EntranceOffsetX == other.EntranceOffsetX &&
+                EntranceOffsetY == other.EntranceOffsetY &&
+                EntranceOffsetPxX == other.EntranceOffsetPxX &&
+                EntranceOffsetPxY == other.EntranceOffsetPxY &&
+                BuildArea.SequenceEqual(other.BuildArea) &&
+                WoodCost == other.WoodCost &&
+                StoneCost == other.StoneCost &&
+                BuildSupply.SequenceEqual(other.BuildSupply) &&
+                a5 == other.a5 &&
+                SizeArea == other.SizeArea &&
+                SizeX == other.SizeX &&
+                SizeY == other.SizeY &&
+                SizeX2 == other.SizeX2 &&
+                SizeY2 == other.SizeY2 &&
+                WorkerWork == other.WorkerWork &&
+                WorkerRest == other.WorkerRest &&
+                ResInput.SequenceEqual(other.ResInput) &&
+                ResOutput.SequenceEqual(other.ResOutput) &&
+                ResProductionX == other.ResProductionX &&
+                MaxHealth == other.MaxHealth &&
+                Sight == other.Sight &&
+                OwnerType == other.OwnerType &&
+                Unknown.SequenceEqual(other.Unknown);
+        }
+    }
+
+    class WALEdit : UITypeEditor
+    {
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            IWindowsFormsEditorService svc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+            WorkAnimationsList foo = value as WorkAnimationsList;
+            if (svc != null && foo != null)
+            {
+                using (BuildingAnimEditor form = new BuildingAnimEditor())
+                {
+                    form.SetList(foo);
+                    svc.ShowDialog(form);
+                }
+            }
+            return value;
+        }
+    }
+
+    internal class WorkAnimation
+    {
+        public string Name { get; private set; }
+        public Point Offset
+        {
+            get
+            {
+                return new Point(owner.WorkAnimX[index], owner.WorkAnimY[index]);
+            }
+            set
+            {
+                owner.WorkAnimX[index] = value.X;
+                owner.WorkAnimY[index] = value.Y;
+            }
+        }
+
+        public ushort[] SpriteList
+        {
+            get { return owner.WorkAnim[index]; }
+            set { owner.WorkAnim[index] = value; }
+        }
+
+        public ushort SpriteCount
+        {
+            get { return owner.WorkAnimLength[index]; }
+            set { owner.WorkAnimLength[index] = Math.Min(value, (ushort)30); }
+        }
+
+        Building owner;
+        int index;
+
+        public int Index { get { return index; } }
+
+        public WorkAnimation(string name, Building owner, int index)
+        {
+            Name = name;
+            this.owner = owner;
+            this.index = index;
+        }
+    }
+
+    [Editor(typeof(WALEdit), typeof(UITypeEditor))]
+    internal class WorkAnimationsList
+    {
+        internal List<WorkAnimation> list;
+        internal Building owner;
+
+        public WorkAnimationsList(Building owner)
+        {
+            this.owner = owner;
+            list = new List<WorkAnimation>();
+            list.Add(new WorkAnimation("Work 0", owner, 0));
+            list.Add(new WorkAnimation("Work 1", owner, 1));
+            list.Add(new WorkAnimation("Work 2", owner, 2));
+            list.Add(new WorkAnimation("Work 3", owner, 3));
+            list.Add(new WorkAnimation("Work 4", owner, 4));
+            list.Add(new WorkAnimation("Smoke", owner, 5));
+            list.Add(new WorkAnimation("Flagpole", owner, 6));
+            list.Add(new WorkAnimation("Inhabitant idle", owner, 7));
+            list.Add(new WorkAnimation("Flag 0", owner, 8));
+            list.Add(new WorkAnimation("Flag 1", owner, 9));
+            list.Add(new WorkAnimation("Flag 2", owner, 10));
+            list.Add(new WorkAnimation("Fire 0", owner, 11));
+            list.Add(new WorkAnimation("Fire 1", owner, 12));
+            list.Add(new WorkAnimation("Fire 2", owner, 13));
+            list.Add(new WorkAnimation("Fire 3", owner, 14));
+            list.Add(new WorkAnimation("Fire 4", owner, 15));
+            list.Add(new WorkAnimation("Fire 5", owner, 16));
+            list.Add(new WorkAnimation("Fire 6", owner, 17));
+            list.Add(new WorkAnimation("Fire 7", owner, 18));
+        }
+
+        public override string ToString()
+        {
+            return "Work animation list";
+        }
+    }
+
+    class Mapelem : IEntity
+    {
+        public ushort[] Anim;
+        public ushort AnimLength;
+        public bool Choppable;
+        public bool Walkable;
+        public bool BuildableOnEntireTile;
+        public int Unknown;
+        public bool Growable;
+        public bool KeepPlantingDistance;
+        public byte TreeTrunk;
+        public bool Buildable;
+
+        public Mapelem(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+        public bool Dirty { get; set; }
+        public long RawOffset { get; set; }
+
+        public int RX => 3;
+        public int lcmOfAnims => AnimLength;
+
+        public void Draw(Form1 form, BitmapData d, int time)
+        {
+            Form1.drawSprite(d, 3, Anim[time % AnimLength], 0, 0);
+        }
+
+        public void SwitchViewTo(Form1 form)
+        {
+            form.stackPanel1.SelectTab(2);
+            form.stackPanel2.SelectTab(2);
+        }
     }
 
     static class Ext
@@ -885,6 +956,13 @@ Vineyard";
             var res = new ushort[count];
             Buffer.BlockCopy(t, 0, res, 0, t.Length);
             return res;
+        }
+
+        public static void Write(this BinaryWriter w, ushort[] data)
+        {
+            var buffer = new byte[data.Length * 2];
+            Buffer.BlockCopy(data, 0, buffer, 0, buffer.Length);
+            w.Write(buffer);
         }
     }
 }

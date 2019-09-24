@@ -16,9 +16,9 @@ namespace KAM_Graphics_Editor
             InitializeComponent();
         }
 
-        Form1.WorkAnimationsList AnimList;
+        WorkAnimationsList AnimList;
 
-        internal void SetList(Form1.WorkAnimationsList foo)
+        internal void SetList(WorkAnimationsList foo)
         {
             AnimList = foo;
             listBox1.SuspendLayout();
