@@ -251,10 +251,12 @@ Vineyard";
             }));
         }
 
-        internal struct frame
+        internal class frame
         {
             public ushort W, H;
             public int X, Y;
+            public frame OldVersion;
+            public long RawOffset;
             public byte[] Raw;
         }
 
@@ -262,7 +264,6 @@ Vineyard";
 
         frame[] loadRX(string name)
         {
-            int[] count = new int[256];
             frame[] rx;
             string path = Path.Combine(KAMDataFolder, "data", "gfx", "res", name);
             using (var fs = File.OpenRead(path))
@@ -274,16 +275,13 @@ Vineyard";
                 {
                     if (exists[i] != 0)
                     {
+                        rx[i] = new frame();
+                        rx[i].RawOffset = r.BaseStream.Position;
                         rx[i].W = r.ReadUInt16();
                         rx[i].H = r.ReadUInt16();
                         rx[i].X = r.ReadInt32();
                         rx[i].Y = r.ReadInt32();
                         rx[i].Raw = r.ReadBytes(rx[i].W * rx[i].H);
-
-                        //foreach (var item in rx[i].Raw)
-                        //{
-                        //    count[item]++;
-                        //}
                     }
                 }
             }
@@ -336,7 +334,7 @@ Vineyard";
         {
             if (sprIdx == 0xffff)
                 return;
-            frame f = allRX[rx][sprIdx];
+            frame f = allRX[rx][sprIdx] ?? new frame();
             drawFrame(d, posx, posy, f);
         }
 
@@ -373,8 +371,8 @@ Vineyard";
         {
             if (sprIdx == 0xffff)
                 return;
-            frame f = allRX[rx][sprIdx];
-            frame mask = allRX[rx][maskIdx];
+            frame f = allRX[rx][sprIdx] ?? new frame();
+            frame mask = allRX[rx][maskIdx] ?? new frame();
             for (int y = 0; y < f.H; y++)
             {
                 int* ptr = (int*)(d.Scan0 + (y + 200 + f.Y + posy) * d.Stride) + (200 + f.X + posx);

@@ -31,7 +31,7 @@ namespace KAM_Graphics_Editor
         {
             treeView1.BeginUpdate();
             treeView1.Nodes.Clear();
-            var houseroot = treeView1.Nodes.Add("Houses");
+            var houseroot = treeView1.Nodes.Add("houses.dat");
             string housedefines = Path.Combine(KAMDataFolder, "data", "defines", "houses.dat");
             oldEntities = new List<IEntity>();
             using (var fs = File.OpenRead(housedefines))
@@ -47,7 +47,10 @@ namespace KAM_Graphics_Editor
                     a.AnimLength = r.ReadUInt16();
                     a.Offset = new Point(r.ReadInt32(), r.ReadInt32());
                     if (!a.Equals(entities[i] as Animal))
-                        houseroot.Nodes.Add(a.Name);
+                    {
+                        var node = houseroot.Nodes.Add(a.Name);
+                        node.Tag = a;
+                    }
                 }
 
                 for (int i = 0; i < 29; i++)
@@ -103,12 +106,28 @@ namespace KAM_Graphics_Editor
                     b.Unknown = r.ReadBytes(36);
 
                     if (!b.Equals(entities[i + 30] as Building))
-                        houseroot.Nodes.Add(b.Name);
+                    {
+                        var node = houseroot.Nodes.Add(b.Name);
+                        node.Tag = b;
+                    }
                 }
 
                 if (houseroot.Nodes.Count == 0)
                     treeView1.Nodes.Remove(houseroot);
             }
+
+            var houserxroot = treeView1.Nodes.Add("houses.rx");
+            for (int i = 0; i < Form1.allRX[2].Length; i++)
+            {
+                var sprite = Form1.allRX[2][i];
+                if (sprite != null && sprite.OldVersion != null)
+                {
+                    var node = houserxroot.Nodes.Add("Sprite " + i);
+                    node.Tag = sprite;
+                }
+            }
+            if (houserxroot.Nodes.Count == 0)
+                treeView1.Nodes.Remove(houserxroot);
 
             if (treeView1.Nodes.Count == 0)
                 treeView1.Nodes.Add("No changes to save");
@@ -118,9 +137,9 @@ namespace KAM_Graphics_Editor
 
         private void TreeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (entityByName.ContainsKey(e.Node.Text))
+            if (e.Node.Tag is IEntity entity)
             {
-                propertyGridOld.SelectedObject = oldEntities.Find(x => x.Name == e.Node.Text);
+                propertyGridOld.SelectedObject = entity;
                 propertyGridNew.SelectedObject = entityByName[e.Node.Text];
             }
             else
@@ -134,7 +153,8 @@ namespace KAM_Graphics_Editor
         {
             foreach (var root in treeView1.Nodes)
             {
-                if (((TreeNode)root).Text == "Houses")
+                string nodeText = ((TreeNode)root).Text;
+                if (nodeText == "houses.dat")
                 {
                     MemoryStream houses = new MemoryStream();
                     string housedefines = Path.Combine(KAMDataFolder, "data", "defines", "houses.dat");
@@ -212,13 +232,45 @@ namespace KAM_Graphics_Editor
                     {
                         houses.CopyTo(f);
                         f.Close();
-                        string backupFile = Path.ChangeExtension(housedefines, ".dat.backup");
+                        string backupFile = Path.ChangeExtension(housedefines, ".dat.bak");
                         try { File.Delete(backupFile); } catch { }
                         File.Move(housedefines, backupFile);
                         File.Move(housedefines + "tmp", housedefines);
                     }
                 }
+                else if (nodeText == "houses.rx")
+                {
+                    MemoryStream houses = new MemoryStream();
+                    string housesrx = Path.Combine(KAMDataFolder, "data", "gfx", "res", "houses.rx");
+                    using (var f = File.OpenRead(housesrx))
+                        f.CopyTo(houses);
 
+                    byte[] buffer = new byte[12];
+                    int[] ibuffer = new int[3];
+                    foreach (var item in ((TreeNode)root).Nodes)
+                    {
+                        var sprite = ((TreeNode)item).Tag as Form1.frame;
+                        System.Diagnostics.Debug.Assert(sprite != null && sprite.OldVersion != null);
+                        houses.Position = sprite.OldVersion.RawOffset;
+                        ibuffer[0] = sprite.W | (sprite.H << 16);
+                        ibuffer[1] = sprite.X;
+                        ibuffer[2] = sprite.Y;
+                        Buffer.BlockCopy(ibuffer, 0, buffer, 0, 12);
+                        houses.Write(buffer, 0, 12);
+                        houses.Write(sprite.Raw, 0, sprite.Raw.Length);
+                    }
+
+                    houses.Position = 0;
+                    using (var f = File.OpenWrite(housesrx + "tmp"))
+                    {
+                        houses.CopyTo(f);
+                        f.Close();
+                        string backupFile = Path.ChangeExtension(housesrx, ".rx.bak");
+                        try { File.Delete(backupFile); } catch { }
+                        File.Move(housesrx, backupFile);
+                        File.Move(housesrx + "tmp", housesrx);
+                    }
+                }
             }
 
 

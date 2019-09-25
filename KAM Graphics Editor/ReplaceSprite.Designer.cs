@@ -29,19 +29,20 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.spriteSavedLabel = new System.Windows.Forms.LinkLabel();
+            this.button1 = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.button2 = new System.Windows.Forms.Button();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.spriteSavedLabel = new System.Windows.Forms.LinkLabel();
-            this.button3 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.checkBoxIndexed = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -52,10 +53,11 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBoxIndexed);
             this.groupBox1.Controls.Add(this.textBox1);
             this.groupBox1.Controls.Add(this.button3);
-            this.groupBox1.Controls.Add(this.spriteSavedLabel);
             this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Controls.Add(this.spriteSavedLabel);
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.comboBox1);
@@ -66,6 +68,72 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Sprite select";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(13, 229);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(123, 152);
+            this.textBox1.TabIndex = 5;
+            this.textBox1.Text = "Note: a modified palette is used in which all usable colors are distinct. Images " +
+    "that do not match that palette exactly cannot be imported.";
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(13, 387);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(123, 31);
+            this.button3.TabIndex = 4;
+            this.button3.Text = "Replace";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(12, 98);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(123, 37);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Export sprite";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
+            // 
+            // spriteSavedLabel
+            // 
+            this.spriteSavedLabel.AutoSize = true;
+            this.spriteSavedLabel.Location = new System.Drawing.Point(12, 78);
+            this.spriteSavedLabel.Name = "spriteSavedLabel";
+            this.spriteSavedLabel.Size = new System.Drawing.Size(87, 17);
+            this.spriteSavedLabel.TabIndex = 3;
+            this.spriteSavedLabel.TabStop = true;
+            this.spriteSavedLabel.Text = "Sprite saved";
+            this.spriteSavedLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.SpriteSavedLabel_LinkClicked);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(13, 186);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(123, 37);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Import sprite";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(13, 53);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(129, 22);
+            this.numericUpDown1.TabIndex = 1;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.NumericUpDown1_ValueChanged);
             // 
             // comboBox1
             // 
@@ -80,19 +148,6 @@
             this.comboBox1.TabIndex = 0;
             this.comboBox1.Text = "Houses";
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(13, 53);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(129, 22);
-            this.numericUpDown1.TabIndex = 1;
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.NumericUpDown1_ValueChanged);
             // 
             // groupBox2
             // 
@@ -113,16 +168,6 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(13, 154);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(123, 37);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Import sprite";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // openFileDialog1
             // 
@@ -150,53 +195,20 @@
             this.pictureBox2.TabIndex = 0;
             this.pictureBox2.TabStop = false;
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(13, 81);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(123, 37);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Export sprite";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_Click);
-            // 
             // saveFileDialog1
             // 
             this.saveFileDialog1.DefaultExt = "png";
             this.saveFileDialog1.Filter = "PNG files|*.png";
             // 
-            // spriteSavedLabel
+            // checkBoxIndexed
             // 
-            this.spriteSavedLabel.AutoSize = true;
-            this.spriteSavedLabel.Location = new System.Drawing.Point(13, 125);
-            this.spriteSavedLabel.Name = "spriteSavedLabel";
-            this.spriteSavedLabel.Size = new System.Drawing.Size(87, 17);
-            this.spriteSavedLabel.TabIndex = 3;
-            this.spriteSavedLabel.TabStop = true;
-            this.spriteSavedLabel.Text = "Sprite saved";
-            this.spriteSavedLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.SpriteSavedLabel_LinkClicked);
-            // 
-            // button3
-            // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(13, 387);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(123, 31);
-            this.button3.TabIndex = 4;
-            this.button3.Text = "Replace";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.Button3_Click);
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(13, 197);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(123, 173);
-            this.textBox1.TabIndex = 5;
-            this.textBox1.Text = "Note: a modified palette is used in which all usable colors are distinct. Images " +
-    "that do not match that palette exactly cannot be imported.";
+            this.checkBoxIndexed.AutoSize = true;
+            this.checkBoxIndexed.Location = new System.Drawing.Point(13, 141);
+            this.checkBoxIndexed.Name = "checkBoxIndexed";
+            this.checkBoxIndexed.Size = new System.Drawing.Size(123, 21);
+            this.checkBoxIndexed.TabIndex = 6;
+            this.checkBoxIndexed.Text = "Indexed format";
+            this.checkBoxIndexed.UseVisualStyleBackColor = true;
             // 
             // ReplaceSprite
             // 
@@ -236,5 +248,6 @@
         private System.Windows.Forms.LinkLabel spriteSavedLabel;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.CheckBox checkBoxIndexed;
     }
 }
