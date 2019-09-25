@@ -2,7 +2,7 @@
 
 KAM graphics edit is a program intended to modify the existing graphics of Knights and Merchants TPR with custom ones, for this it intended to offer several features:
 
-- [x] replace individual sprite
+- [ ] replace individual sprite (~~house~~, tree, unit, gui)
 - [ ] modify building animation sprite origin
 - [x] modify building animation data (sprites used, sprite count, offset)
 - [x] preview changes to building animations
