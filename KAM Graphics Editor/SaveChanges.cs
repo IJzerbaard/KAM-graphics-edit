@@ -243,21 +243,27 @@ namespace KAM_Graphics_Editor
                     MemoryStream houses = new MemoryStream();
                     string housesrx = Path.Combine(KAMDataFolder, "data", "gfx", "res", "houses.rx");
                     using (var f = File.OpenRead(housesrx))
-                        f.CopyTo(houses);
-
-                    byte[] buffer = new byte[12];
-                    int[] ibuffer = new int[3];
-                    foreach (var item in ((TreeNode)root).Nodes)
                     {
-                        var sprite = ((TreeNode)item).Tag as Form1.frame;
-                        System.Diagnostics.Debug.Assert(sprite != null && sprite.OldVersion != null);
-                        houses.Position = sprite.OldVersion.RawOffset;
-                        ibuffer[0] = sprite.W | (sprite.H << 16);
-                        ibuffer[1] = sprite.X;
-                        ibuffer[2] = sprite.Y;
-                        Buffer.BlockCopy(ibuffer, 0, buffer, 0, 12);
-                        houses.Write(buffer, 0, 12);
-                        houses.Write(sprite.Raw, 0, sprite.Raw.Length);
+                        byte[] buffer = new byte[12];
+                        int[] ibuffer = new int[3];
+                        long lastPos = 0;
+                        foreach (var item in from n in ((TreeNode)root).Nodes.Cast<TreeNode>()
+                                             let sprite = (Form1.frame)n.Tag
+                                             orderby sprite.OldVersion.RawOffset
+                                             select sprite)
+                        {
+                            var sprite = item;
+                            CopyStream(f, houses, (int)(sprite.OldVersion.RawOffset - lastPos));
+                            f.Position += 12 + sprite.OldVersion.Raw.Length;
+                            lastPos = sprite.OldVersion.RawOffset + 12 + sprite.OldVersion.Raw.Length;
+                            ibuffer[0] = sprite.W | (sprite.H << 16);
+                            ibuffer[1] = sprite.X;
+                            ibuffer[2] = sprite.Y;
+                            Buffer.BlockCopy(ibuffer, 0, buffer, 0, 12);
+                            houses.Write(buffer, 0, 12);
+                            houses.Write(sprite.Raw, 0, sprite.Raw.Length);
+                        }
+                        CopyStream(f, houses, int.MaxValue);
                     }
 
                     houses.Position = 0;
@@ -275,6 +281,19 @@ namespace KAM_Graphics_Editor
 
 
             Close();
+        }
+
+        static void CopyStream(Stream input, Stream output, int bytes)
+        {
+            if (bytes <= 0)
+                return;
+            byte[] buffer = new byte[4096];
+            int read;
+            while (bytes > 0 && (read = input.Read(buffer, 0, Math.Min(buffer.Length, bytes))) > 0)
+            {
+                output.Write(buffer, 0, read);
+                bytes -= read;
+            }
         }
     }
 }

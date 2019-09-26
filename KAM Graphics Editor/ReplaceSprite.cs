@@ -52,6 +52,7 @@ namespace KAM_Graphics_Editor
 
             colorToIndex.Add(0, 0);
             colorToIndex.Add(unchecked((int)0xFFFF00FF), 0);
+            colorToIndex.Add(0xFF00FF, 0);
             for (int i = 1; i < pal.Length; i++)
             {
                 if (i >= 224 && i < 251 || i == 255)

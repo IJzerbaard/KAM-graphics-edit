@@ -586,7 +586,7 @@ Vineyard";
         }
     }
 
-    internal class Building : IEntity, IEquatable<Building>
+    class Building : IEntity, IEquatable<Building>
     {
         [Category("Construction")]
         public ushort StoneTexture { get; set; }
@@ -620,6 +620,7 @@ Vineyard";
         public sbyte EntranceOffsetPxX { get; set; }
         public sbyte EntranceOffsetPxY { get; set; }
         [Category("Construction")]
+        [TypeConverter(typeof(ByteArrayConverter))]
         public byte[] BuildArea { get; set; }
         [Category("Construction Cost")]
         public byte WoodCost { get; set; }
@@ -636,8 +637,10 @@ Vineyard";
         public ushort WorkerWork { get; set; }
         public ushort WorkerRest { get; set; }
         [Category("Production")]
+        [TypeConverter(typeof(ByteArrayConverter))]
         public byte[] ResInput { get; set; }
         [Category("Production")]
+        [TypeConverter(typeof(ByteArrayConverter))]
         public byte[] ResOutput { get; set; }
         [Category("Production")]
         public sbyte ResProductionX { get; set; }
@@ -645,6 +648,7 @@ Vineyard";
         public ushort MaxHealth { get; set; }
         public ushort Sight { get; set; }
         public byte OwnerType { get; set; }
+        [TypeConverter(typeof(ByteArrayConverter))]
         public byte[] Unknown { get; set; }
 
         public Building(string name)
@@ -826,6 +830,86 @@ Vineyard";
         }
     }
 
+    class Mapelem : IEntity
+    {
+        public ushort[] Anim
+        {
+            get;
+            set;
+        }
+        public ushort AnimLength { get; set; }
+        public bool Choppable { get; set; }
+        public bool Walkable { get; set; }
+        public bool BuildableOnEntireTile { get; set; }
+        [Description("This field is usually 0, but set to 1 for grapes and wheat, and for one type of reeds.")]
+        public int Unknown { get; set; }
+        public bool Growable { get; set; }
+        public bool KeepPlantingDistance { get; set; }
+        public byte TreeTrunk { get; set; }
+        public bool Buildable { get; set; }
+
+        public Mapelem(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+        [ReadOnly(true)]
+        public long RawOffset { get; set; }
+        [Browsable(false)]
+        public int RX => 3;
+        [Browsable(false)]
+        public int lcmOfAnims => AnimLength;
+
+        public void Draw(Form1 form, BitmapData d, int time)
+        {
+            Form1.drawSprite(d, 3, Anim[time % AnimLength], 0, 0);
+        }
+
+        public void SwitchViewTo(Form1 form)
+        {
+            form.stackPanel1.SelectTab(2);
+            form.stackPanel2.SelectTab(2);
+            form.propertyGridMapelem.SelectedObject = this;
+        }
+    }
+
+    class ByteArrayConverter : TypeConverter
+    {
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType == typeof(string))
+                return string.Join(", ", value as byte[]);
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            if (value.GetType() == typeof(string))
+            {
+                string txt = (string)value;
+                string[] fields = txt.Split(new char[] { ',' });
+                try
+                {
+                    return (value as string).Split(',').Select(s => byte.Parse(s)).ToArray();
+                }
+                catch
+                {
+                    throw new InvalidCastException(
+                        "Cannot convert the input '" +
+                        value.ToString() + "' into a byte[]");
+                }
+            }
+            else
+                return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        }
+    }
+
     class WALEdit : UITypeEditor
     {
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
@@ -849,7 +933,7 @@ Vineyard";
         }
     }
 
-    internal class WorkAnimation
+    class WorkAnimation
     {
         public string Name { get; private set; }
         public Point Offset
@@ -891,7 +975,7 @@ Vineyard";
     }
 
     [Editor(typeof(WALEdit), typeof(UITypeEditor))]
-    internal class WorkAnimationsList
+    class WorkAnimationsList
     {
         internal List<WorkAnimation> list;
         internal Building owner;
@@ -924,45 +1008,6 @@ Vineyard";
         public override string ToString()
         {
             return "Work animation list";
-        }
-    }
-
-    class Mapelem : IEntity
-    {
-        public ushort[] Anim { get; set; }
-        public ushort AnimLength { get; set; }
-        public bool Choppable { get; set; }
-        public bool Walkable { get; set; }
-        public bool BuildableOnEntireTile { get; set; }
-        public int Unknown { get; set; }
-        public bool Growable { get; set; }
-        public bool KeepPlantingDistance { get; set; }
-        public byte TreeTrunk { get; set; }
-        public bool Buildable { get; set; }
-
-        public Mapelem(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; }
-        [ReadOnly(true)]
-        public long RawOffset { get; set; }
-        [Browsable(false)]
-        public int RX => 3;
-        [Browsable(false)]
-        public int lcmOfAnims => AnimLength;
-
-        public void Draw(Form1 form, BitmapData d, int time)
-        {
-            Form1.drawSprite(d, 3, Anim[time % AnimLength], 0, 0);
-        }
-
-        public void SwitchViewTo(Form1 form)
-        {
-            form.stackPanel1.SelectTab(2);
-            form.stackPanel2.SelectTab(2);
-            form.propertyGridMapelem.SelectedObject = this;
         }
     }
 
