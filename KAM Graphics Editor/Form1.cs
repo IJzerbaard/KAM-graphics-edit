@@ -18,6 +18,8 @@ namespace KAM_Graphics_Editor
             InitializeComponent();
         }
 
+
+
         static Form1()
         {
             var t = @"Sawmill
@@ -120,7 +122,7 @@ Vineyard";
                     Animal a = new Animal("Animal " + i);
                     entities.Add(a);
                     a.RawOffset = r.BaseStream.Position;
-                    a.Anim = r.ReadUInt16s(30);
+                    a.Anim = r.ReadInt16s(30);
                     a.AnimLength = r.ReadUInt16();
                     a.Offset = new Point(r.ReadInt32(), r.ReadInt32());
                 }
@@ -132,16 +134,16 @@ Vineyard";
                     Building b = new Building(BuildingNames[i]);
                     entities.Add(b);
                     b.RawOffset = r.BaseStream.Position;
-                    b.StoneTexture = r.ReadUInt16();
-                    b.WoodTexture = r.ReadUInt16();
-                    b.WoodenConstructionMaskTexture = r.ReadUInt16();
-                    b.StoneConstructionMaskTexture = r.ReadUInt16();
-                    b.SupplyResourcesIn = r.ReadUInt16s(20);
-                    b.SupplyResourcesOut = r.ReadUInt16s(20);
+                    b.StoneTexture = r.ReadInt16();
+                    b.WoodTexture = r.ReadInt16();
+                    b.WoodenConstructionMaskTexture = r.ReadInt16();
+                    b.StoneConstructionMaskTexture = r.ReadInt16();
+                    b.SupplyResourcesIn = r.ReadInt16s(20);
+                    b.SupplyResourcesOut = r.ReadInt16s(20);
 
                     for (int j = 0; j < 19; j++)
                     {
-                        b.WorkAnim[j] = r.ReadUInt16s(30);
+                        b.WorkAnim[j] = r.ReadInt16s(30);
                         b.WorkAnimLength[j] = r.ReadUInt16();
                         b.WorkAnimX[j] = r.ReadInt32();
                         b.WorkAnimY[j] = r.ReadInt32();
@@ -216,7 +218,8 @@ Vineyard";
                 {
                     Mapelem d = new Mapelem("Mapelem " + i);
                     entities.Add(d);
-                    d.Anim = r.ReadUInt16s(30);
+                    d.RawOffset = fs.Position;
+                    d.Anim = r.ReadInt16s(30);
                     d.AnimLength = r.ReadUInt16();
                     r.ReadUInt64();
                     d.Choppable = r.ReadInt32() == 1;
@@ -330,9 +333,9 @@ Vineyard";
             }
         }
 
-        public static unsafe void drawSprite(BitmapData d, int rx, ushort sprIdx, int posx, int posy)
+        public static unsafe void drawSprite(BitmapData d, int rx, short sprIdx, int posx, int posy)
         {
-            if (sprIdx == 0xffff)
+            if (sprIdx < 0)
                 return;
             frame f = allRX[rx][sprIdx] ?? new frame();
             drawFrame(d, posx, posy, f);
@@ -367,9 +370,9 @@ Vineyard";
             }
         }
 
-        public static unsafe void drawSpriteMasked(BitmapData d, int rx, ushort sprIdx, int posx, int posy, ushort maskIdx, int steps)
+        public static unsafe void drawSpriteMasked(BitmapData d, int rx, short sprIdx, int posx, int posy, short maskIdx, int steps)
         {
-            if (sprIdx == 0xffff)
+            if (sprIdx < 0 || maskIdx < 0)
                 return;
             frame f = allRX[rx][sprIdx] ?? new frame();
             frame mask = allRX[rx][maskIdx] ?? new frame();
@@ -406,6 +409,21 @@ Vineyard";
         Bitmap[] bms = new Bitmap[2] { new Bitmap(400, 400), new Bitmap(400, 400) };
         int bmindex = 0;
 
+        DrawParams getDrawParams()
+        {
+            DrawParams dp = new DrawParams();
+            dp.MainForm = this;
+            dp.Stone = true;
+            dp.Flags = flagCheckBox.Checked;
+            dp.Smoke = smokeCheckBox.Checked;
+            dp.WorkIndex = comboBox1.SelectedIndex;
+            dp.Fires = fireCheckBoxes.CheckedIndices.Cast<int>().ToList();
+            dp.Res = resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
+            dp.Swines = checkedListBox1.CheckedIndices.Cast<int>().ToList();
+            dp.Horses = checkedListBox2.CheckedIndices.Cast<int>().ToList();
+            return dp;
+        }
+
         unsafe void drawFrame(int time, IEntity selected)
         {
             int bmi = System.Threading.Interlocked.Increment(ref bmindex);
@@ -420,7 +438,7 @@ Vineyard";
                     *ptr++ = 0;
             }
 
-            selected.Draw(this, d, time);
+            selected.Draw(getDrawParams(), d, time);
 
             bm.UnlockBits(d);
 
@@ -470,7 +488,7 @@ Vineyard";
 
             Bitmap bm = new Bitmap(400, 400);
             var d = bm.LockBits(new Rectangle(0, 0, 400, 400), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            selected.Draw(this, d, 0);
+            selected.Draw(getDrawParams(), d, 0);
             bm.UnlockBits(d);
 
             int len = selected.lcmOfAnims;
@@ -490,7 +508,7 @@ Vineyard";
                         {
                             bm = new Bitmap(400, 400);
                             d = bm.LockBits(new Rectangle(0, 0, 400, 400), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                            selected.Draw(this, d, i);
+                            selected.Draw(getDrawParams(), d, i);
                             bm.UnlockBits(d);
                             collection.Add(new ImageMagick.MagickImage(bm));
                             collection[i].AnimationDelay = 10;
@@ -546,14 +564,40 @@ Vineyard";
         int RX { get; }
         int lcmOfAnims { get; }
 
-        void Draw(Form1 form, BitmapData d, int time);
+        void Draw(DrawParams dp, BitmapData d, int time);
+    }
+
+    public class DrawParams
+    {
+        public bool Flags, Smoke, Stone;
+        public int WorkIndex;
+        public List<int> Fires, Res, Swines, Horses;
+        public Form1 MainForm;
+
+        public DrawParams()
+        {
+            Fires = new List<int>();
+            Res = Fires;
+            Swines = Fires;
+            Horses = Fires;
+        }
     }
 
     class Animal : IEntity, IEquatable<Animal>
     {
         public Point Offset { get; set; }
-        public ushort[] Anim { get; set; }
+        [DisplayName("Animation (raw)")]
+        public short[] Anim { get; set; }
+        [DisplayName("Animation length (raw)")]
         public ushort AnimLength { get; set; }
+
+        [TypeConverter(typeof(SpriteArrayConverter))]
+        [ArrayLength(30)]
+        public short[] Animation
+        {
+            get { return Anim; }
+            set { Anim = value; }
+        }
 
         public Animal(string name)
         {
@@ -568,7 +612,7 @@ Vineyard";
         [Browsable(false)]
         public int lcmOfAnims => AnimLength;
 
-        public void Draw(Form1 form, BitmapData d, int time)
+        public void Draw(DrawParams dp, BitmapData d, int time)
         {
             Form1.drawSprite(d, 2, Anim[time % AnimLength], 0, 0);
         }
@@ -589,21 +633,21 @@ Vineyard";
     class Building : IEntity, IEquatable<Building>
     {
         [Category("Construction")]
-        public ushort StoneTexture { get; set; }
+        public short StoneTexture { get; set; }
         [Category("Construction")]
-        public ushort WoodTexture { get; set; }
+        public short WoodTexture { get; set; }
         [Category("Construction")]
-        public ushort WoodenConstructionMaskTexture { get; set; }
+        public short WoodenConstructionMaskTexture { get; set; }
         [Category("Construction")]
-        public ushort StoneConstructionMaskTexture { get; set; }
+        public short StoneConstructionMaskTexture { get; set; }
         [Category("Working")]
         public WorkAnimationsList WorkAnimations { get; set; }
         [Category("Working")]
-        public ushort[] SupplyResourcesIn { get; set; }
+        public short[] SupplyResourcesIn { get; set; }
         [Category("Working")]
-        public ushort[] SupplyResourcesOut { get; set; }
+        public short[] SupplyResourcesOut { get; set; }
         [Category("Working")]
-        public ushort[][] WorkAnim { get; set; }
+        public short[][] WorkAnim { get; set; }
         [Category("Working")]
         public ushort[] WorkAnimLength { get; set; }
         [Category("Working")]
@@ -654,7 +698,7 @@ Vineyard";
         public Building(string name)
         {
             Name = name;
-            WorkAnim = new ushort[19][];
+            WorkAnim = new short[19][];
             WorkAnimLength = new ushort[19];
             WorkAnimX = new int[19];
             WorkAnimY = new int[19];
@@ -672,28 +716,25 @@ Vineyard";
         [Browsable(false)]
         public int lcmOfAnims { get; set; }
 
-        public void Draw(Form1 form, BitmapData d, int time)
+        public void Draw(DrawParams dp, BitmapData d, int time)
         {
-            bool drawFlags = form.flagCheckBox.Checked;
-            bool drawSmoke = form.smokeCheckBox.Checked;
-            int selectedWorkIndex = form.comboBox1.SelectedIndex;
-            List<int> enabledFires = form.fireCheckBoxes.CheckedIndices.Cast<int>().ToList();
-            List<int> enabledRes = form.resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
-            List<int> enabledSwines = form.checkedListBox1.CheckedIndices.Cast<int>().ToList();
-            List<int> enabledHorses = form.checkedListBox2.CheckedIndices.Cast<int>().ToList();
-
-            int renderMode = form.listBox1.SelectedIndex;
-            int buildStepsWood = form.trackBar3.Value;
-            int buildStepsStone = form.trackBar6.Value;
+            int renderMode = 0, buildStepsWood = 0, buildStepsStone = 0;
+            if (dp.MainForm != null)
+            {
+                renderMode = dp.MainForm.listBox1.SelectedIndex;
+                buildStepsWood = dp.MainForm.trackBar3.Value;
+                buildStepsStone = dp.MainForm.trackBar6.Value;
+            }
 
             lcmOfAnims = 1;
 
             switch (renderMode)
             {
                 case 0:
-                    Form1.drawSprite(d, 2, StoneTexture, 0, 0);
+                    if (dp.Stone)
+                        Form1.drawSprite(d, 2, StoneTexture, 0, 0);
 
-                    foreach (var item in enabledRes)
+                    foreach (var item in dp.Res)
                     {
                         int index = item % 5 + 5 * (item / 10);
                         if (((item / 5) & 1) == 0)
@@ -704,7 +745,7 @@ Vineyard";
 
                     if (Name == "Swine Farm")
                     {
-                        foreach (var item in enabledSwines)
+                        foreach (var item in dp.Swines)
                         {
                             var a = Form1.animals[item];
                             int t = time % a.AnimLength;
@@ -714,7 +755,7 @@ Vineyard";
                     }
                     else if (Name == "Stables")
                     {
-                        foreach (var item in enabledHorses)
+                        foreach (var item in dp.Horses)
                         {
                             var a = Form1.animals[item + 15];
                             int t = time % a.AnimLength;
@@ -723,10 +764,10 @@ Vineyard";
                         }
                     }
 
-                    if (drawSmoke)
+                    if (dp.Smoke)
                         drawWorkAnim(d, time, 5);
 
-                    if (drawFlags)
+                    if (dp.Flags)
                     {
                         drawWorkAnim(d, time, 6);
                         drawWorkAnim(d, time, 8);
@@ -734,17 +775,15 @@ Vineyard";
                         drawWorkAnim(d, time, 10);
                     }
 
-                    if (selectedWorkIndex == 0)
+                    if (dp.WorkIndex == 0)
                         ; // nothing
-                    else if (selectedWorkIndex == 1)
+                    else if (dp.WorkIndex == 1)
                         drawWorkAnim(d, time, 7);
                     else
-                        drawWorkAnim(d, time, selectedWorkIndex - 2);
+                        drawWorkAnim(d, time, dp.WorkIndex - 2);
 
-                    foreach (var item in enabledFires)
-                    {
+                    foreach (var item in dp.Fires)
                         drawWorkAnim(d, time, item + 11);
-                    }
                     break;
 
                 case 1:
@@ -832,12 +871,6 @@ Vineyard";
 
     class Mapelem : IEntity
     {
-        public ushort[] Anim
-        {
-            get;
-            set;
-        }
-        public ushort AnimLength { get; set; }
         public bool Choppable { get; set; }
         public bool Walkable { get; set; }
         public bool BuildableOnEntireTile { get; set; }
@@ -847,6 +880,21 @@ Vineyard";
         public bool KeepPlantingDistance { get; set; }
         public byte TreeTrunk { get; set; }
         public bool Buildable { get; set; }
+
+        [DisplayName("Animation (raw)")]
+        [Category("Animation")]
+        public short[] Anim { get; set; }
+        [DisplayName("Animation length (raw)")]
+        [Category("Animation")]
+        public ushort AnimLength { get; set; }
+
+        [TypeConverter(typeof(SpriteArrayConverter))]
+        [ArrayLength(30)]
+        public short[] Animation
+        {
+            get { return Anim; }
+            set { Anim = value; }
+        }
 
         public Mapelem(string name)
         {
@@ -861,7 +909,7 @@ Vineyard";
         [Browsable(false)]
         public int lcmOfAnims => AnimLength;
 
-        public void Draw(Form1 form, BitmapData d, int time)
+        public void Draw(DrawParams dp, BitmapData d, int time)
         {
             Form1.drawSprite(d, 3, Anim[time % AnimLength], 0, 0);
         }
@@ -888,7 +936,6 @@ Vineyard";
             if (value.GetType() == typeof(string))
             {
                 string txt = (string)value;
-                string[] fields = txt.Split(new char[] { ',' });
                 try
                 {
                     return (value as string).Split(',').Select(s => byte.Parse(s)).ToArray();
@@ -898,6 +945,55 @@ Vineyard";
                     throw new InvalidCastException(
                         "Cannot convert the input '" +
                         value.ToString() + "' into a byte[]");
+                }
+            }
+            else
+                return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        }
+    }
+
+    class ArrayLengthAttribute : Attribute
+    {
+        public readonly int Length;
+
+        public ArrayLengthAttribute(int length)
+        {
+            Length = length;
+        }
+    }
+
+    class SpriteArrayConverter : TypeConverter
+    {
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType == typeof(string))
+                return string.Join(", ", value as short[]);
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            if (value.GetType() == typeof(string))
+            {
+                string txt = (string)value;
+                var lengthAttr = context.PropertyDescriptor.Attributes[typeof(ArrayLengthAttribute)] as ArrayLengthAttribute;
+                try
+                {
+                    return (value as string).Split(',')
+                        .Select(s => short.Parse(s))
+                        .Concat(Enumerable.Repeat((short)-1, int.MaxValue))
+                        .Take(lengthAttr.Length).ToArray();
+                }
+                catch
+                {
+                    throw new InvalidCastException(
+                        "Cannot convert the input '" +
+                        value.ToString() + "' into a short[" + lengthAttr.Length + "]");
                 }
             }
             else
@@ -923,9 +1019,8 @@ Vineyard";
             WorkAnimationsList foo = value as WorkAnimationsList;
             if (svc != null && foo != null)
             {
-                using (BuildingAnimEditor form = new BuildingAnimEditor())
+                using (BuildingAnimEditor form = new BuildingAnimEditor(foo))
                 {
-                    form.SetList(foo);
                     svc.ShowDialog(form);
                 }
             }
@@ -935,6 +1030,7 @@ Vineyard";
 
     class WorkAnimation
     {
+        [Browsable(false)]
         public string Name { get; private set; }
         public Point Offset
         {
@@ -949,12 +1045,16 @@ Vineyard";
             }
         }
 
-        public ushort[] SpriteList
+        [DisplayName("Sprite list (raw)")]
+        [TypeConverter(typeof(SpriteArrayConverter))]
+        [ArrayLength(30)]
+        public short[] SpriteList
         {
             get { return owner.WorkAnim[index]; }
             set { owner.WorkAnim[index] = value; }
         }
 
+        [DisplayName("Sprite count (raw)")]
         public ushort SpriteCount
         {
             get { return owner.WorkAnimLength[index]; }
@@ -964,6 +1064,7 @@ Vineyard";
         Building owner;
         int index;
 
+        [Browsable(false)]
         public int Index { get { return index; } }
 
         public WorkAnimation(string name, Building owner, int index)
@@ -1013,18 +1114,20 @@ Vineyard";
 
     static class Ext
     {
-        public static ushort[] ReadUInt16s(this BinaryReader r, int count)
+        public static short[] ReadInt16s(this BinaryReader r, int count)
         {
             var t = r.ReadBytes(count * 2);
-            var res = new ushort[count];
+            var res = new short[count];
             Buffer.BlockCopy(t, 0, res, 0, t.Length);
             return res;
         }
 
-        public static void Write(this BinaryWriter w, ushort[] data)
+        public static void Write(this BinaryWriter w, short[] data, int length)
         {
-            var buffer = new byte[data.Length * 2];
-            Buffer.BlockCopy(data, 0, buffer, 0, buffer.Length);
+            var buffer = new byte[length * 2];
+            Buffer.BlockCopy(data, 0, buffer, 0, Math.Min(buffer.Length, data.Length * 2));
+            for (int i = 2 * data.Length; i < buffer.Length; i++)
+                buffer[i] = 0xFF;
             w.Write(buffer);
         }
     }

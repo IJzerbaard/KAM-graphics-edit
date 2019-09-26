@@ -174,7 +174,7 @@ namespace KAM_Graphics_Editor
                     for (int j = 0; j < d.Width; j++)
                         *ptr++ = 0;
                 }
-                Form1.drawSprite(d, rx, (ushort)index, 0, 0);
+                Form1.drawSprite(d, rx, (short)index, 0, 0);
                 buffer.UnlockBits(d);
                 pictureBox1.Image = buffer;
             }

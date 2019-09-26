@@ -43,7 +43,7 @@ namespace KAM_Graphics_Editor
                     Animal a = new Animal("Animal " + i);
                     oldEntities.Add(a);
                     a.RawOffset = r.BaseStream.Position;
-                    a.Anim = r.ReadUInt16s(30);
+                    a.Anim = r.ReadInt16s(30);
                     a.AnimLength = r.ReadUInt16();
                     a.Offset = new Point(r.ReadInt32(), r.ReadInt32());
                     if (!a.Equals(entities[i] as Animal))
@@ -58,16 +58,16 @@ namespace KAM_Graphics_Editor
                     Building b = new Building(Form1.BuildingNames[i]);
                     oldEntities.Add(b);
                     b.RawOffset = r.BaseStream.Position;
-                    b.StoneTexture = r.ReadUInt16();
-                    b.WoodTexture = r.ReadUInt16();
-                    b.WoodenConstructionMaskTexture = r.ReadUInt16();
-                    b.StoneConstructionMaskTexture = r.ReadUInt16();
-                    b.SupplyResourcesIn = r.ReadUInt16s(20);
-                    b.SupplyResourcesOut = r.ReadUInt16s(20);
+                    b.StoneTexture = r.ReadInt16();
+                    b.WoodTexture = r.ReadInt16();
+                    b.WoodenConstructionMaskTexture = r.ReadInt16();
+                    b.StoneConstructionMaskTexture = r.ReadInt16();
+                    b.SupplyResourcesIn = r.ReadInt16s(20);
+                    b.SupplyResourcesOut = r.ReadInt16s(20);
 
                     for (int j = 0; j < 19; j++)
                     {
-                        b.WorkAnim[j] = r.ReadUInt16s(30);
+                        b.WorkAnim[j] = r.ReadInt16s(30);
                         b.WorkAnimLength[j] = r.ReadUInt16();
                         b.WorkAnimX[j] = r.ReadInt32();
                         b.WorkAnimY[j] = r.ReadInt32();
@@ -168,7 +168,7 @@ namespace KAM_Graphics_Editor
                         var w = new BinaryWriter(houses);
                         if (entity is Animal a)
                         {
-                            w.Write(a.Anim);
+                            w.Write(a.Anim, 30);
                             w.Write(a.AnimLength);
                             w.Write(a.Offset.X);
                             w.Write(a.Offset.Y);
@@ -179,12 +179,12 @@ namespace KAM_Graphics_Editor
                             w.Write(b.WoodTexture);
                             w.Write(b.WoodenConstructionMaskTexture);
                             w.Write(b.StoneConstructionMaskTexture);
-                            w.Write(b.SupplyResourcesIn);
-                            w.Write(b.SupplyResourcesOut);
+                            w.Write(b.SupplyResourcesIn, 20);
+                            w.Write(b.SupplyResourcesOut, 20);
 
                             for (int j = 0; j < 19; j++)
                             {
-                                w.Write(b.WorkAnim[j]);
+                                w.Write(b.WorkAnim[j], 30);
                                 w.Write(b.WorkAnimLength[j]);
                                 w.Write(b.WorkAnimX[j]);
                                 w.Write(b.WorkAnimY[j]);

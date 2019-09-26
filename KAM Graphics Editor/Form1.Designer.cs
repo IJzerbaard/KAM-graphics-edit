@@ -422,7 +422,7 @@
             this.flagCheckBox.Name = "flagCheckBox";
             this.flagCheckBox.Size = new System.Drawing.Size(288, 21);
             this.flagCheckBox.TabIndex = 0;
-            this.flagCheckBox.Text = "Flag";
+            this.flagCheckBox.Text = "Flags";
             this.flagCheckBox.UseVisualStyleBackColor = true;
             // 
             // tabPage5
