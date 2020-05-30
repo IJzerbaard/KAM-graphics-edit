@@ -54,9 +54,43 @@ Vineyard";
             BuildingNames = t.Split('\n');
             for (int i = 0; i < BuildingNames.Length; i++)
                 BuildingNames[i] = BuildingNames[i].Trim();
+            UnitNames = new string[] { "Serf", "Woodcutter", "Mine worker", "Animal breeder", "Farmer", "Carpenter", "Baker", "Butcher", "Fisherman", "Laborer", "Stonemason", "Blacksmith", "Metallurgist", "Recruit", "Militia", "Axe fighter", "Sword fighter", "Bowman", "Crossbowman", "Lancer", "Pikeman", "Scout", "Knight", "Barbarian", "Rebel", "Rogue", "Warrior", "Vagabond", "Catapult", "Ballista"};
+            string resources = @"Tree trunk
+Stone
+Timber
+Iron ore
+Gold ore
+Coal
+Iron
+Gold
+Wine
+Wheat
+Loaves
+Flour
+Leather
+Sausages
+Pig
+Skin
+Wooden Shield
+Iron Shield
+Leather Armor
+Iron Armor
+Handaxe
+Longsword
+Lance
+Pike
+Longbow
+Crossbow
+Horse
+Fish";
+            ResourceNames = resources.Split('\n');
+            for (int i = 0; i < ResourceNames.Length; i++)
+                ResourceNames[i] = ResourceNames[i].Trim();
         }
 
         public static string[] BuildingNames;
+        public static string[] UnitNames;
+        public static string[] ResourceNames;
         string KAMDataFolder;
 
         void findKAMfolder()
@@ -108,6 +142,7 @@ Vineyard";
         }
 
         List<IEntity> entities = new List<IEntity>();
+        internal static List<Building> buildings;
 
         void loadHouses()
         {
@@ -183,6 +218,7 @@ Vineyard";
                 }
             }
 
+            Form1.buildings = entities.Skip(30).Cast<Building>().ToList();
             this.entities.AddRange(entities);
 
             treeView1.Invoke(new Action(() =>
@@ -195,6 +231,84 @@ Vineyard";
                     foreach (var item in entities)
                     {
                         var root = item is Animal ? animalsroot : houseroot;
+                        var t = root.Nodes.Add(item.Name);
+                        t.Tag = item;
+                    }
+                }
+                finally
+                {
+                    treeView1.EndUpdate();
+                }
+            }));
+        }
+
+        void loadUnits()
+        {
+            List<IEntity> entities = new List<IEntity>();
+            string defines = Path.Combine(KAMDataFolder, "data", "defines", "unit.dat");
+            using (var fs = File.OpenRead(defines))
+            {
+                BinaryReader r = new BinaryReader(fs);
+
+                for (int i = 0; i < 28; i++)
+                {
+                    for (int dir = 0; dir < 8; dir++)
+                    {
+                        //Serf a = new Serf("Serf (" + ResourceNames[i] + ")");
+                        //entities.Add(a);
+                        //a.RawOffset = r.BaseStream.Position;
+                        r.ReadInt16s(30);
+                        r.ReadUInt16();
+                        new Point(r.ReadInt32(), r.ReadInt32());
+                    }
+                }
+
+                //serfs = new List<Serf>(entities.Cast<Serf>());
+
+                for (int i = 0; i < UnitNames.Length; i++)
+                {
+                    Unit unit = new Unit(UnitNames[i], i);
+                    entities.Add(unit);
+                    unit.RawOffset = r.BaseStream.Position;
+                    unit.HP = r.ReadUInt16();
+                    unit.ATK = r.ReadUInt16();
+                    unit.ATKC = r.ReadUInt16();
+                    unit.x4 = r.ReadUInt16();
+                    unit.DEF = r.ReadUInt16();
+                    unit.Speed = r.ReadUInt16();
+                    unit.x7 = r.ReadUInt16();
+                    unit.Sight = r.ReadUInt16();
+                    unit.x9 = r.ReadUInt16();
+                    unit.x10 = r.ReadUInt16();
+                    unit.x11 = r.ReadUInt16();
+
+                    for (int j = 0; j < 14; j++)
+                    {
+                        for (int dir = 0; dir < 8; dir++)
+                        {
+                            int idx = j * 8 + dir;
+                            unit.ActAnim[idx] = r.ReadInt16s(30);
+                            unit.ActAnimLength[idx] = r.ReadUInt16();
+                            unit.ActAnimX[idx] = r.ReadInt32();
+                            unit.ActAnimY[idx] = r.ReadInt32();
+                        }
+                    }
+
+                    unit.stat2 = r.ReadInt16s(18);
+                }
+            }
+
+            this.entities.AddRange(entities);
+
+            treeView1.Invoke(new Action(() =>
+            {
+                treeView1.BeginUpdate();
+                try
+                {
+                    var unitsroot = treeView1.Nodes.Add("Units");
+                    foreach (var item in entities)
+                    {
+                        var root = unitsroot;
                         var t = root.Nodes.Add(item.Name);
                         t.Tag = item;
                     }
@@ -302,6 +416,7 @@ Vineyard";
                 allRX[4] = loadRX("units.rx");
 
                 loadHouses();
+                loadUnits();
                 loadMapelem();
             }
             catch
@@ -421,6 +536,8 @@ Vineyard";
             dp.Res = resourcesCheckBoxes.CheckedIndices.Cast<int>().ToList();
             dp.Swines = checkedListBox1.CheckedIndices.Cast<int>().ToList();
             dp.Horses = checkedListBox2.CheckedIndices.Cast<int>().ToList();
+            dp.SelectedAct = Math.Max(0, listBox2.SelectedIndex) * 8 + Math.Max(0, listBox3.SelectedIndex);
+            dp.WholeUnit = checkBox1.Checked;
             return dp;
         }
 
@@ -479,7 +596,7 @@ Vineyard";
             return (a / gcd(a, b)) * b;
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private unsafe void Button1_Click(object sender, EventArgs e)
         {
             if (selected == null)
                 return;
@@ -501,13 +618,41 @@ Vineyard";
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 try
-                {
-                    using (var collection = new ImageMagick.MagickImageCollection())
+                {/*
+                    using (var w = new BinaryWriter(saveFileDialog1.OpenFile()))
+                    {
+                        w.Write((byte)'G');
+                        w.Write((byte)'I');
+                        w.Write((byte)'F');
+                        w.Write((byte)'8');
+                        w.Write((byte)'9');
+                        w.Write((byte)'a');
+                        w.Write((ushort)400);
+                        w.Write((ushort)400);
+                        w.Write((byte)0xF7);
+                        w.Write((byte)0);
+                        w.Write((byte)0);
+                        // GCT
+                        for (int i = 0; i < 256; i++)
+                        {
+                            //w.Write((byte)())
+                        }
+
+                    }*/
+                        using (var collection = new ImageMagick.MagickImageCollection())
                     {
                         for (int i = 0; i < len; i++)
                         {
                             bm = new Bitmap(400, 400);
                             d = bm.LockBits(new Rectangle(0, 0, 400, 400), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+                            for (int y = 0; y < 400; y++)
+                            {
+                                uint* ptr = (uint*)(d.Scan0 + y * d.Stride);
+                                for (int x = 0; x < 400; x++)
+                                {
+                                    ptr[x] = 0xFF000000;
+                                }
+                            }
                             selected.Draw(getDrawParams(), d, i);
                             bm.UnlockBits(d);
                             collection.Add(new ImageMagick.MagickImage(bm));
@@ -519,7 +664,7 @@ Vineyard";
                         qs.DitherMethod = ImageMagick.DitherMethod.No;
                         collection.Quantize(qs);
 
-                        collection.Optimize();
+                        //collection.Optimize();
 
                         collection.Write(saveFileDialog1.FileName);
                     }
@@ -572,6 +717,8 @@ Vineyard";
         public bool Flags, Smoke, Stone;
         public int WorkIndex;
         public List<int> Fires, Res, Swines, Horses;
+        public int SelectedAct;
+        public bool WholeUnit;
         public Form1 MainForm;
 
         public DrawParams()
@@ -627,6 +774,133 @@ Vineyard";
         {
             form.stackPanel1.SelectTab(0);
             form.stackPanel2.SelectTab(0);
+        }
+    }
+
+    class Unit : IEntity, IEquatable<Unit>
+    {
+        [Category("Combat")]
+        public ushort HP { get; set; }
+        [Category("Combat")]
+        public ushort ATK { get; set; }
+        [Category("Combat")]
+        public ushort ATKC { get; set; }
+        [Category("Unknown")]
+        public ushort x4 { get; set; }
+        [Category("Combat")]
+        public ushort DEF { get; set; }
+        [Category("General Stats")]
+        public ushort Speed { get; set; }
+        [Category("Unknown")]
+        public ushort x7 { get; set; }
+        [Category("General Stats")]
+        public ushort Sight { get; set; }
+        [Category("Unknown")]
+        public ushort x9 { get; set; }
+        [Category("Unknown")]
+        public ushort x10 { get; set; }
+        [Category("Unknown")]
+        public ushort x11 { get; set; }
+
+        [Category("Acts")]
+        public short[][] ActAnim { get; set; }
+        [Category("Acts")]
+        public ushort[] ActAnimLength { get; set; }
+        [Category("Acts")]
+        public int[] ActAnimX { get; set; }
+        [Category("Acts")]
+        public int[] ActAnimY { get; set; }
+        [Category("Acts")]
+        public UnitActAnimationsList ActAnimations { get; set; }
+        [Category("Unknown")]
+        public short[] stat2 { get; set; }
+
+        public Unit(string name, int index)
+        {
+            Index = index;
+            Name = name;
+            ActAnim = new short[14 * 8][];
+            ActAnimLength = new ushort[14 * 8];
+            ActAnimX = new int[14 * 8];
+            ActAnimY = new int[14 * 8];
+            ActAnimations = new UnitActAnimationsList(this);
+        }
+
+        int Index;
+        public string Name { get; }
+        [ReadOnly(true)]
+        public long RawOffset { get; set; }
+        [Browsable(false)]
+        public int RX => 4;
+        [Browsable(false)]
+        public int lcmOfAnims => lcm;
+        int lcm = 1;
+
+        public void Draw(DrawParams dp, BitmapData d, int time)
+        {
+            lcm = ActAnimLength[dp.SelectedAct];            
+            if (dp.WholeUnit)
+            {
+                int idx;
+                switch (dp.SelectedAct >> 3)
+                {
+                    case 0:
+                        Form1.drawSprite(d, 4, ActAnim[dp.SelectedAct][time % ActAnimLength[dp.SelectedAct]], 0, 0);
+                        if (Index <= 1 || Index == 4 || Index == 10)
+                        {
+                            idx = (dp.SelectedAct & 7) + 64;
+                            Form1.drawSprite(d, 4, ActAnim[idx][time % ActAnimLength[idx]], 0, 0);
+                        }
+                        break;
+                    case 7:
+                        // eating
+                        Form1.drawSprite(d, 2, Form1.buildings[27].StoneTexture, 0, 0);
+                        drawWorkAnim(d, time, Form1.buildings[27], 6);
+                        drawWorkAnim(d, time, Form1.buildings[27], 8);
+                        drawWorkAnim(d, time, Form1.buildings[27], 9);
+                        drawWorkAnim(d, time, Form1.buildings[27], 10);
+                        Form1.drawSprite(d, 4, ActAnim[dp.SelectedAct][time % ActAnimLength[dp.SelectedAct]], 0, 0);
+                        break;
+                    case 9:
+                    case 10:
+                    case 11:
+                    case 12:
+                        idx = dp.SelectedAct & 7;
+                        Form1.drawSprite(d, 4, ActAnim[idx][time % ActAnimLength[idx]], 0, 0);
+                        Form1.drawSprite(d, 4, ActAnim[dp.SelectedAct][time % ActAnimLength[dp.SelectedAct]], 0, 0);
+                        break;
+                    default:
+                        Form1.drawSprite(d, 4, ActAnim[dp.SelectedAct][time % ActAnimLength[dp.SelectedAct]], 0, 0);
+                        break;
+                }
+            }
+            else
+            {
+                Form1.drawSprite(d, 4, ActAnim[dp.SelectedAct][time % ActAnimLength[dp.SelectedAct]], 0, 0);
+            }
+        }
+
+        void drawWorkAnim(BitmapData d, int time, Building b, int index)
+        {
+            if (b.WorkAnimLength[index] == 0)
+                return;
+            Form1.drawSprite(d, 2, b.WorkAnim[index][time % b.WorkAnimLength[index]], b.WorkAnimX[index], b.WorkAnimY[index]);
+            lcm = Form1.lcm(lcmOfAnims, b.WorkAnimLength[index]);
+        }
+
+        public bool Equals(Unit other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchViewTo(Form1 form)
+        {
+            form.stackPanel1.SelectTab(5);
+            form.stackPanel2.SelectTab(3);
+            form.propertyGridUnit.SelectedObject = this;
+
+            if (form.listBox2.SelectedIndex < 0) form.listBox2.SelectedIndex = 0;
+            if (form.listBox3.SelectedIndex < 0) form.listBox3.SelectedIndex = 0;
         }
     }
 
@@ -1046,6 +1320,7 @@ Vineyard";
         }
 
         [DisplayName("Sprite list (raw)")]
+        [Description("Keep the effective length of this list in sync with the Sprite count")]
         [TypeConverter(typeof(SpriteArrayConverter))]
         [ArrayLength(30)]
         public short[] SpriteList
@@ -1109,6 +1384,108 @@ Vineyard";
         public override string ToString()
         {
             return "Work animation list";
+        }
+    }
+
+    class UnitActAnimation
+    {
+        [Browsable(false)]
+        public string Name { get; private set; }
+        public Point Offset
+        {
+            get
+            {
+                return new Point(owner.ActAnimX[index], owner.ActAnimY[index]);
+            }
+            set
+            {
+                owner.ActAnimX[index] = value.X;
+                owner.ActAnimY[index] = value.Y;
+            }
+        }
+
+        [DisplayName("Sprite list (raw)")]
+        [Description("Keep the effective length of this list in sync with the Sprite count")]
+        [TypeConverter(typeof(SpriteArrayConverter))]
+        [ArrayLength(30)]
+        public short[] SpriteList
+        {
+            get { return owner.ActAnim[index]; }
+            set { owner.ActAnim[index] = value; }
+        }
+
+        [DisplayName("Sprite count (raw)")]
+        public ushort SpriteCount
+        {
+            get { return owner.ActAnimLength[index]; }
+            set { owner.ActAnimLength[index] = Math.Min(value, (ushort)30); }
+        }
+
+        Unit owner;
+        int index;
+
+        [Browsable(false)]
+        public int Index { get { return index; } }
+
+        public UnitActAnimation(string name, Unit owner, int index)
+        {
+            Name = name;
+            this.owner = owner;
+            this.index = index;
+        }
+    }
+
+    [Editor(typeof(UALEdit), typeof(UITypeEditor))]
+    class UnitActAnimationsList
+    {
+        internal Unit Owner;
+        internal List<UnitActAnimation> Acts;
+
+        public UnitActAnimationsList(Unit owner)
+        {
+            this.Owner = owner;
+            Acts = new List<UnitActAnimation>();
+            Add(Acts, new UnitActAnimation("Walk", owner, 0));
+            Add(Acts, new UnitActAnimation("Attack", owner, 1));
+            Add(Acts, new UnitActAnimation("Charge/Projectile", owner, 2));
+            Add(Acts, new UnitActAnimation("Die", owner, 3));
+            Add(Acts, new UnitActAnimation("Work 1", owner, 4));
+            Add(Acts, new UnitActAnimation("Work 2", owner, 5));
+            Add(Acts, new UnitActAnimation("Work 3", owner, 6));
+            Add(Acts, new UnitActAnimation("Eat (inn)", owner, 7));
+            Add(Acts, new UnitActAnimation("Arm/Flag", owner, 8));
+            Add(Acts, new UnitActAnimation("Work 4", owner, 9));
+            Add(Acts, new UnitActAnimation("Work 5", owner, 10));
+            Add(Acts, new UnitActAnimation("Work 6", owner, 11));
+            Add(Acts, new UnitActAnimation("Work 7", owner, 12));
+            Add(Acts, new UnitActAnimation("Act 13", owner, 13));
+        }
+
+        void Add(List<UnitActAnimation> list, UnitActAnimation act)
+        {
+            list.Add(new UnitActAnimation(act.Name, Owner, act.Index));
+        }
+    }
+
+    class UALEdit : UITypeEditor
+    {
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            IWindowsFormsEditorService svc = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+            UnitActAnimationsList foo = value as UnitActAnimationsList;
+            if (svc != null && foo != null)
+            {
+                using (UnitAnimEditor form = new UnitAnimEditor(foo))
+                {
+                    svc.ShowDialog(form);
+                }
+            }
+            return value;
         }
     }
 

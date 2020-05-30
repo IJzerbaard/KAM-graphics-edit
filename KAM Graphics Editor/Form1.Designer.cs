@@ -64,6 +64,12 @@
             this.label7 = new System.Windows.Forms.Label();
             this.trackBar4 = new System.Windows.Forms.TrackBar();
             this.label6 = new System.Windows.Forms.Label();
+            this.tabPage12 = new System.Windows.Forms.TabPage();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.listBox3 = new System.Windows.Forms.ListBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.listBox2 = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -78,6 +84,8 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.propertyGridMapelem = new System.Windows.Forms.PropertyGrid();
+            this.tabPage13 = new System.Windows.Forms.TabPage();
+            this.propertyGridUnit = new System.Windows.Forms.PropertyGrid();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -107,6 +115,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).BeginInit();
+            this.tabPage12.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.stackPanel2.SuspendLayout();
@@ -114,6 +125,7 @@
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabPage6.SuspendLayout();
+            this.tabPage13.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -186,6 +198,7 @@
             this.stackPanel1.Controls.Add(this.tabPage5);
             this.stackPanel1.Controls.Add(this.tabPage7);
             this.stackPanel1.Controls.Add(this.tabPage8);
+            this.stackPanel1.Controls.Add(this.tabPage12);
             this.stackPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.stackPanel1.Location = new System.Drawing.Point(0, 0);
             this.stackPanel1.Name = "stackPanel1";
@@ -213,7 +226,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(294, 457);
+            this.tabPage2.Size = new System.Drawing.Size(294, 456);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Building (working)";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -227,7 +240,7 @@
             this.stackPanel3.Location = new System.Drawing.Point(132, 69);
             this.stackPanel3.Name = "stackPanel3";
             this.stackPanel3.SelectedIndex = 0;
-            this.stackPanel3.Size = new System.Drawing.Size(155, 385);
+            this.stackPanel3.Size = new System.Drawing.Size(155, 384);
             this.stackPanel3.TabIndex = 5;
             // 
             // tabPage9
@@ -235,7 +248,7 @@
             this.tabPage9.Location = new System.Drawing.Point(4, 25);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(147, 356);
+            this.tabPage9.Size = new System.Drawing.Size(147, 355);
             this.tabPage9.TabIndex = 0;
             this.tabPage9.Text = "Normal";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -246,7 +259,7 @@
             this.tabPage10.Location = new System.Drawing.Point(4, 25);
             this.tabPage10.Name = "tabPage10";
             this.tabPage10.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage10.Size = new System.Drawing.Size(147, 356);
+            this.tabPage10.Size = new System.Drawing.Size(147, 355);
             this.tabPage10.TabIndex = 1;
             this.tabPage10.Text = "Swinefarm";
             this.tabPage10.UseVisualStyleBackColor = true;
@@ -274,7 +287,7 @@
             "Pig 14"});
             this.checkedListBox1.Location = new System.Drawing.Point(3, 3);
             this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(141, 350);
+            this.checkedListBox1.Size = new System.Drawing.Size(141, 349);
             this.checkedListBox1.TabIndex = 0;
             // 
             // tabPage11
@@ -283,7 +296,7 @@
             this.tabPage11.Location = new System.Drawing.Point(4, 25);
             this.tabPage11.Name = "tabPage11";
             this.tabPage11.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage11.Size = new System.Drawing.Size(147, 356);
+            this.tabPage11.Size = new System.Drawing.Size(147, 355);
             this.tabPage11.TabIndex = 2;
             this.tabPage11.Text = "Stable";
             this.tabPage11.UseVisualStyleBackColor = true;
@@ -311,7 +324,7 @@
             "Horse 14"});
             this.checkedListBox2.Location = new System.Drawing.Point(3, 3);
             this.checkedListBox2.Name = "checkedListBox2";
-            this.checkedListBox2.Size = new System.Drawing.Size(141, 350);
+            this.checkedListBox2.Size = new System.Drawing.Size(141, 349);
             this.checkedListBox2.TabIndex = 0;
             // 
             // panel4
@@ -321,7 +334,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel4.Location = new System.Drawing.Point(3, 69);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(129, 385);
+            this.panel4.Size = new System.Drawing.Size(129, 384);
             this.panel4.TabIndex = 5;
             // 
             // resourcesCheckBoxes
@@ -362,7 +375,7 @@
             "Out3: 5"});
             this.resourcesCheckBoxes.Location = new System.Drawing.Point(0, 140);
             this.resourcesCheckBoxes.Name = "resourcesCheckBoxes";
-            this.resourcesCheckBoxes.Size = new System.Drawing.Size(129, 245);
+            this.resourcesCheckBoxes.Size = new System.Drawing.Size(129, 244);
             this.resourcesCheckBoxes.TabIndex = 4;
             // 
             // fireCheckBoxes
@@ -430,7 +443,7 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 25);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(294, 457);
+            this.tabPage5.Size = new System.Drawing.Size(294, 456);
             this.tabPage5.TabIndex = 2;
             this.tabPage5.Text = "Mapelem";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -446,7 +459,7 @@
             this.tabPage7.Location = new System.Drawing.Point(4, 25);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(294, 457);
+            this.tabPage7.Size = new System.Drawing.Size(294, 456);
             this.tabPage7.TabIndex = 3;
             this.tabPage7.Text = "Building (frame)";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -510,7 +523,7 @@
             this.tabPage8.Location = new System.Drawing.Point(4, 25);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(294, 457);
+            this.tabPage8.Size = new System.Drawing.Size(294, 456);
             this.tabPage8.TabIndex = 4;
             this.tabPage8.Text = "Building (stone)";
             this.tabPage8.UseVisualStyleBackColor = true;
@@ -562,6 +575,98 @@
             this.label6.Size = new System.Drawing.Size(50, 17);
             this.label6.TabIndex = 1;
             this.label6.Text = "Planks";
+            // 
+            // tabPage12
+            // 
+            this.tabPage12.Controls.Add(this.checkBox1);
+            this.tabPage12.Controls.Add(this.groupBox5);
+            this.tabPage12.Controls.Add(this.groupBox4);
+            this.tabPage12.Location = new System.Drawing.Point(4, 25);
+            this.tabPage12.Name = "tabPage12";
+            this.tabPage12.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage12.Size = new System.Drawing.Size(294, 457);
+            this.tabPage12.TabIndex = 5;
+            this.tabPage12.Text = "Unit";
+            this.tabPage12.UseVisualStyleBackColor = true;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(6, 337);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(121, 21);
+            this.checkBox1.TabIndex = 2;
+            this.checkBox1.Text = "Render Whole";
+            this.checkBox1.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.listBox3);
+            this.groupBox5.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox5.Location = new System.Drawing.Point(3, 170);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(288, 161);
+            this.groupBox5.TabIndex = 1;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Direction";
+            // 
+            // listBox3
+            // 
+            this.listBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox3.FormattingEnabled = true;
+            this.listBox3.ItemHeight = 16;
+            this.listBox3.Items.AddRange(new object[] {
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"});
+            this.listBox3.Location = new System.Drawing.Point(3, 18);
+            this.listBox3.Name = "listBox3";
+            this.listBox3.Size = new System.Drawing.Size(282, 140);
+            this.listBox3.TabIndex = 0;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.listBox2);
+            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox4.Location = new System.Drawing.Point(3, 3);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(288, 167);
+            this.groupBox4.TabIndex = 0;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Act";
+            // 
+            // listBox2
+            // 
+            this.listBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.ItemHeight = 16;
+            this.listBox2.Items.AddRange(new object[] {
+            "Walk",
+            "Attack",
+            "Charge/Projectile",
+            "Die",
+            "Work 1",
+            "Work 2",
+            "Work 3",
+            "Eat (inn)",
+            "Arm/Flag",
+            "Work 4",
+            "Work 5",
+            "Work 6",
+            "Work 7",
+            "Act 13"});
+            this.listBox2.Location = new System.Drawing.Point(3, 18);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(282, 146);
+            this.listBox2.TabIndex = 0;
             // 
             // panel1
             // 
@@ -615,6 +720,7 @@
             this.stackPanel2.Controls.Add(this.tabPage3);
             this.stackPanel2.Controls.Add(this.tabPage4);
             this.stackPanel2.Controls.Add(this.tabPage6);
+            this.stackPanel2.Controls.Add(this.tabPage13);
             this.stackPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.stackPanel2.Location = new System.Drawing.Point(579, 3);
             this.stackPanel2.Name = "stackPanel2";
@@ -639,7 +745,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(563, 478);
+            this.tabPage4.Size = new System.Drawing.Size(563, 477);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Building";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -650,7 +756,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox3.Location = new System.Drawing.Point(3, 88);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(557, 387);
+            this.groupBox3.Size = new System.Drawing.Size(557, 386);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Properties";
@@ -660,7 +766,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(3, 18);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(551, 366);
+            this.propertyGrid1.Size = new System.Drawing.Size(551, 365);
             this.propertyGrid1.TabIndex = 0;
             // 
             // groupBox2
@@ -694,7 +800,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 25);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(563, 478);
+            this.tabPage6.Size = new System.Drawing.Size(563, 477);
             this.tabPage6.TabIndex = 2;
             this.tabPage6.Text = "Mapelem";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -704,8 +810,27 @@
             this.propertyGridMapelem.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridMapelem.Location = new System.Drawing.Point(3, 3);
             this.propertyGridMapelem.Name = "propertyGridMapelem";
-            this.propertyGridMapelem.Size = new System.Drawing.Size(557, 472);
+            this.propertyGridMapelem.Size = new System.Drawing.Size(557, 471);
             this.propertyGridMapelem.TabIndex = 0;
+            // 
+            // tabPage13
+            // 
+            this.tabPage13.Controls.Add(this.propertyGridUnit);
+            this.tabPage13.Location = new System.Drawing.Point(4, 25);
+            this.tabPage13.Name = "tabPage13";
+            this.tabPage13.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage13.Size = new System.Drawing.Size(563, 477);
+            this.tabPage13.TabIndex = 3;
+            this.tabPage13.Text = "Unit";
+            this.tabPage13.UseVisualStyleBackColor = true;
+            // 
+            // propertyGridUnit
+            // 
+            this.propertyGridUnit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridUnit.Location = new System.Drawing.Point(3, 3);
+            this.propertyGridUnit.Name = "propertyGridUnit";
+            this.propertyGridUnit.Size = new System.Drawing.Size(557, 471);
+            this.propertyGridUnit.TabIndex = 0;
             // 
             // folderBrowserDialog1
             // 
@@ -812,6 +937,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).EndInit();
+            this.tabPage12.ResumeLayout(false);
+            this.tabPage12.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -820,6 +949,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.tabPage6.ResumeLayout(false);
+            this.tabPage13.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -889,6 +1019,14 @@
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replaceSpriteToolStripMenuItem;
         internal System.Windows.Forms.PropertyGrid propertyGridMapelem;
+        private System.Windows.Forms.TabPage tabPage12;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox groupBox5;
+        public System.Windows.Forms.ListBox listBox2;
+        public System.Windows.Forms.ListBox listBox3;
+        private System.Windows.Forms.TabPage tabPage13;
+        public System.Windows.Forms.PropertyGrid propertyGridUnit;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 
